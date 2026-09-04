@@ -1,6 +1,6 @@
 /**
  * MAUSAM SETU — Application Configuration
- * SIH 2026 — Team CodeSmashers
+ * National Disaster Early-Warning Platform
  *
  * NOTE: All data is in DEMO MODE unless a real API is configured.
  * Demo data is clearly labelled throughout the application.
@@ -10,9 +10,9 @@ const MS_CONFIG = {
   // ── App Identity ───────────────────────────────────────────
   APP_NAME:    'Mausam Setu',
   APP_TAGLINE: 'Connecting Citizens with Weather, Warnings & Safety',
-  APP_VERSION: '1.0.0-SIH2026',
-  TEAM:        'CodeSmashers',
-  SIH_ID:      'SIH26068',
+  APP_VERSION: '1.0.0',
+  PLATFORM: 'Mausam Setu',
+  
 
   // ── Demo Mode ──────────────────────────────────────────────
   // Set to true = all data is simulated and labelled as DEMO DATA

@@ -223,7 +223,7 @@ const Utils = {
   },
 
   demoSimBadge() {
-    return `<span class="demo-badge sim-badge" title="This is a simulated alert for SIH demonstration. Not a real emergency.">🔬 SIMULATION</span>`;
+    return `<span class="demo-badge sim-badge" title="This is a simulated alert for demonstration purposes. Not a real emergency.">🔬 SIMULATION</span>`;
   },
 
   // ── Is Day ─────────────────────────────────────────────────

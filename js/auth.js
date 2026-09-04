@@ -1,6 +1,6 @@
 /**
  * MAUSAM SETU — Authentication Service
- * Uses localStorage for SIH demo. Production would use server auth.
+ * Uses localStorage for demo mode. Production would use server auth.
  */
 
 const AuthService = {
@@ -10,7 +10,7 @@ const AuthService = {
     { id: 'U001', name: 'Arjun Singh', mobile: '9876543210', email: 'user@demo.com',    password: 'demo123', role: 'citizen',  state: 'Delhi' },
     { id: 'U002', name: 'Priya Patel', mobile: '9123456789', email: 'farmer@demo.com',  password: 'demo123', role: 'farmer',   state: 'Gujarat' },
     { id: 'U003', name: 'Rajan Kumar', mobile: '9012345678', email: 'fish@demo.com',    password: 'demo123', role: 'fisherman', state: 'Tamil Nadu' },
-    { id: 'ADM1', name: 'Admin User',  mobile: '9000000000', email: 'admin@mausam.gov', password: 'admin@sih2026', role: 'admin', state: 'Delhi' },
+    { id: 'ADM1', name: 'Admin User',  mobile: '9000000000', email: 'admin@mausam.gov', password: 'admin123', role: 'admin', state: 'Delhi' },
   ],
 
   // ── Current user ──────────────────────────────────────────

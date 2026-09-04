@@ -3,13 +3,9 @@
   <h1>Mausam Setu (मौसम सेतु)</h1>
   <p><strong>AI-Powered Weather & Disaster Early-Warning Platform</strong></p>
   <p><em>जुड़ें मौसम से, सुरक्षित रहे हर कदम</em></p>
-  <p><strong>SIH 2026 · Problem Statement: SIH26068 · Team CodeSmashers</strong></p>
-</div>
+  </div>
 
 ---
-[![SIH 2026](https://img.shields.io/badge/SIH-2026-orange?style=for-the-badge)](https://sih.gov.in)
-[![Problem ID](https://img.shields.io/badge/Problem-SIH26068-blue?style=for-the-badge)]()
-[![Team](https://img.shields.io/badge/Team-CodeSmashers-green?style=for-the-badge)]()
 [![Category](https://img.shields.io/badge/Category-Disaster%20Management-red?style=for-the-badge)]()
 
 > **"Connecting Citizens with Weather, Warnings & Safety"**
@@ -21,7 +17,7 @@
 
 ## 🎯 Problem Statement
 
-**SIH26068 — WeatherGPT: Conversational AI for Weather Forecasting, Alerts & Climate Information**
+**Weather Forecasting, Real-Time Alerts & Climate Safety Information**
 
 Organization: Ministry of Earth Sciences (MoES) / India Meteorological Department (IMD)
 
@@ -39,7 +35,7 @@ The challenge: Indian citizens, especially in rural areas, farmers, and fishing 
 | 👤 Citizen | `user@demo.com` | `demo123` |
 | 🌾 Farmer | `farmer@demo.com` | `demo123` |
 | ⚓ Fisherman | `fish@demo.com` | `demo123` |
-| 🛡️ Admin | `admin@mausam.gov` | `admin@sih2026` |
+| 🛡️ Admin | `admin@mausam.gov` | `admin123` |
 
 ---
 
@@ -150,15 +146,6 @@ python -m http.server 8080
 
 ---
 
-## 👥 Team CodeSmashers — SIH 2026
-
-Built for **Smart India Hackathon 2026** | Problem ID: **SIH26068**
-
-Category: Disaster Management | Organization: Ministry of Earth Sciences
-
----
-
-## 📄 License
-
-This project is built for SIH 2026 demonstration purposes.
+## 🛡️ Public Service & Early Warning Platform
+This project is built for public weather safety and disaster early-warning demonstration purposes.
 Official weather data must be sourced from IMD/NDMA for production use.

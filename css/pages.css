@@ -264,8 +264,8 @@ footer {
 .footer-links a { color: rgba(255,255,255,0.5); transition: color var(--transition-fast); }
 .footer-links a:hover { color: white; }
 
-/* SIH Badge */
-.sih-badge {
+/* Organization Badge */
+.org-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
