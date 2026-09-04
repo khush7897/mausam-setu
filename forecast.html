@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>7-Day Forecast — Mausam Setu</title>
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="page-wrapper">
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">Forecast</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link active">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link">🗺️ Map</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="demo-ribbon">⚠️ DEMO MODE</div>
+
+<main class="main-content">
+  <div class="container">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 style="font-size:var(--text-3xl)" data-t="forecast_title">📅 7-Day Weather Forecast</h1>
+        <p style="color:var(--text-muted);margin-top:4px" id="forecast-location">Loading location...</p>
+      </div>
+      <span class="demo-badge">⚠️ DEMO DATA</span>
+    </div>
+
+    <!-- Today Hourly Chart -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">⏰ Today — Hourly Forecast</div>
+        <span class="demo-badge">⚠️ DEMO</span>
+      </div>
+      <div class="card-body">
+        <div class="forecast-scroll" id="hourly-scroll-forecast" style="margin-bottom:20px">
+          <div class="spinner" style="margin:20px auto"></div>
+        </div>
+        <div style="position:relative;height:200px">
+          <canvas id="temp-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rain Probability Chart -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">🌧️ 7-Day Rain Probability</div>
+      </div>
+      <div class="card-body">
+        <div style="position:relative;height:180px">
+          <canvas id="rain-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7-Day Cards -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 7-Day Outlook</div>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div id="forecast-cards">
+          <div style="text-align:center;padding:40px">
+            <div class="spinner spinner-lg" style="margin:0 auto 16px"></div>
+            <p style="color:var(--text-muted)">Loading forecast data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--space-4)">
+      <div class="source-strip">
+        📡 Forecast source: <strong id="forecast-source">DEMO DATA</strong> — Not real IMD data &nbsp;|&nbsp;
+        <a href="https://mausam.imd.gov.in" target="_blank" style="color:var(--primary-600)">mausam.imd.gov.in</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="forecast.html" class="bottom-nav-item active"><span class="nav-icon">📅</span>Forecast</a>
+    <a href="alerts.html" class="bottom-nav-item"><span class="nav-icon">⚠️</span>Alerts</a>
+    <a href="chat.html" class="bottom-nav-item"><span class="nav-icon">🤖</span>AI Chat</a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span>Map</a>
+  </div>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/location.js"></script>
+<script src="js/weather.js"></script>
+<script>
+LangManager.init();
+LocationService.init();
+
+let tempChart = null, rainChart = null;
+
+async function loadForecast() {
+  const loc = LocationService.current || { city:'Mumbai', state:'Maharashtra', lat:19.076, lon:72.877 };
+  document.getElementById('forecast-location').textContent =
+    [loc.city, loc.state].filter(Boolean).join(', ');
+
+  const [forecast, hourly] = await Promise.all([
+    WeatherService.getForecast(loc.city, loc.lat, loc.lon),
+    WeatherService.getHourlyForecast(loc.city, loc.lat, loc.lon),
+  ]);
+
+  if (hourly) {
+    renderHourlyStrip(hourly);
+    renderTempChart(hourly);
+  }
+  if (forecast) {
+    renderForecastCards(forecast);
+    renderRainChart(forecast);
+  }
+}
+
+function renderHourlyStrip(hours) {
+  document.getElementById('hourly-scroll-forecast').innerHTML = hours.map((h, i) => `
+    <div class="forecast-hour-card ${i === 0 ? 'active' : ''}">
+      <div style="font-size:var(--text-xs);${i===0?'color:rgba(255,255,255,.8)':'color:var(--text-muted)'};margin-bottom:6px">${h.time}</div>
+      <div style="font-size:20px;margin-bottom:6px">${Utils.getWeatherIcon(h.condition, !h.isNight)}</div>
+      <div style="font-weight:700;font-size:var(--text-sm)">${h.temp}°</div>
+      <div style="font-size:10px;${i===0?'color:rgba(255,255,255,.6)':'color:var(--text-muted)'};margin-top:4px">🌧️${h.rain_prob}%</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">💨${h.wind}</div>
+    </div>
+  `).join('');
+}
+
+function renderTempChart(hourly) {
+  const ctx = document.getElementById('temp-chart').getContext('2d');
+  if (tempChart) tempChart.destroy();
+  tempChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: hourly.map(h => h.time),
+      datasets: [{
+        label: 'Temperature (°C)',
+        data: hourly.map(h => h.temp),
+        borderColor: '#1565C0',
+        backgroundColor: 'rgba(21,101,192,0.08)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#1565C0',
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { callback: v => v + '°C' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderRainChart(forecast) {
+  const ctx = document.getElementById('rain-chart').getContext('2d');
+  if (rainChart) rainChart.destroy();
+  const colors = forecast.map(d => {
+    if (d.rain_prob >= 70) return 'rgba(183,28,28,0.8)';
+    if (d.rain_prob >= 40) return 'rgba(230,81,0,0.8)';
+    return 'rgba(21,101,192,0.7)';
+  });
+  rainChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: forecast.map(d => d.day),
+      datasets: [{
+        label: 'Rain Probability (%)',
+        data: forecast.map(d => d.rain_prob),
+        backgroundColor: colors,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { max: 100, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { callback: v => v + '%' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderForecastCards(days) {
+  document.getElementById('forecast-cards').innerHTML = days.map((d, i) => `
+    <div class="forecast-day-row" style="${i===0?'background:var(--primary-50);':''}">
+      <div class="forecast-day-name" style="width:100px">
+        <div style="font-weight:700;font-size:var(--text-base);color:var(--primary-900)">${d.day}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted)">${d.dateStr}</div>
+      </div>
+      <div class="forecast-day-icon" style="font-size:32px;width:44px;text-align:center">${Utils.getWeatherIcon(d.condition)}</div>
+      <div style="flex:1">
+        <div style="font-size:var(--text-sm);font-weight:600">${d.condition}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted)">💧 ${d.humidity}% &nbsp;|&nbsp; 💨 ${d.wind} km/h</div>
+      </div>
+      <div style="text-align:right;min-width:80px">
+        <span style="font-size:var(--text-xl);font-weight:700;color:${Utils.tempColor(d.temp_max)}">${d.temp_max}°</span>
+        <span style="color:var(--text-muted);font-size:var(--text-sm);margin-left:6px">${d.temp_min}°</span>
+      </div>
+      <div style="width:80px;text-align:right">
+        <div style="font-size:var(--text-sm);font-weight:700;color:${Utils.rainLabel(d.rain_prob).color}">🌧️ ${d.rain_prob}%</div>
+        <div class="rain-bar-container" style="margin-top:6px">
+          <div class="rain-bar-fill" style="width:${d.rain_prob}%;background:${Utils.rainLabel(d.rain_prob).color}"></div>
+        </div>
+        ${d.rain_mm > 0 ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">${d.rain_mm}mm</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+loadForecast();
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Map — Mausam Setu</title>
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="page-wrapper">
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">Disaster Map</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link active">🗺️ Map</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="demo-ribbon">⚠️ DEMO MODE</div>
+
+<main class="main-content">
+  <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5);flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 style="font-size:var(--text-3xl)" data-t="map_title">🗺️ Weather & Disaster Map</h1>
+        <p style="color:var(--text-muted);margin-top:4px">Is danger near me? See alert zones on the map.</p>
+      </div>
+      <span class="demo-badge">🔬 DEMO ZONES</span>
+    </div>
+
+    <div class="demo-mode-notice" style="margin-bottom:var(--space-4)">
+      <span class="demo-mode-notice-icon">🗺️</span>
+      <div class="demo-mode-notice-text">
+        <strong>DEMO MAP — Alert zones are simulated</strong>
+        Alert zone overlays are approximate demo boundaries for SIH demonstration. Not real government-verified disaster boundaries.
+      </div>
+    </div>
+
+    <!-- Map Controls -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--space-4)">
+      <button onclick="showLayer('user')" class="btn btn-primary btn-sm" id="btn-user">📍 My Location</button>
+      <button onclick="showLayer('alerts')" class="btn btn-outline btn-sm" id="btn-alerts">⚠️ Alert Zones</button>
+      <button onclick="showLayer('rainfall')" class="btn btn-outline btn-sm" id="btn-rainfall">🌧️ Rainfall Areas</button>
+      <button onclick="resetView()" class="btn btn-ghost btn-sm">🔄 Reset View</button>
+    </div>
+
+    <!-- Map -->
+    <div id="weather-map" style="height:520px;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-md)"></div>
+
+    <!-- Legend -->
+    <div class="card" style="margin-top:var(--space-4)">
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:var(--space-5);align-items:center">
+        <div style="font-weight:700;font-size:var(--text-sm)" data-t="map_legend">Map Legend</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+          <div style="width:16px;height:16px;background:var(--primary-600);border-radius:50%;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,.3)"></div>
+          <span>Your Location</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+          <div style="width:16px;height:16px;background:rgba(183,28,28,0.4);border:2px solid #B71C1C;border-radius:2px"></div>
+          <span>Emergency Zone</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+          <div style="width:16px;height:16px;background:rgba(230,81,0,0.3);border:2px solid #E65100;border-radius:2px"></div>
+          <span>Warning Zone</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+          <div style="width:16px;height:16px;background:rgba(21,101,192,0.25);border:2px solid #1565C0;border-radius:2px"></div>
+          <span>Heavy Rainfall Area</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm)">
+          <div style="width:16px;height:16px;background:rgba(249,168,37,0.3);border:2px solid #F9A825;border-radius:2px"></div>
+          <span>Watch Zone</span>
+        </div>
+        <div style="margin-left:auto;font-size:var(--text-xs);color:var(--text-muted)">
+          Zones are approximate. <a href="https://ndma.gov.in" target="_blank">ndma.gov.in</a> for official data.
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Alerts on Map -->
+    <div style="margin-top:var(--space-6)">
+      <h2 style="margin-bottom:var(--space-4)">📍 Mapped Alerts</h2>
+      <div id="map-alerts-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-4)">
+        <div class="spinner" style="margin:20px auto;grid-column:1/-1"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="forecast.html" class="bottom-nav-item"><span class="nav-icon">📅</span>Forecast</a>
+    <a href="alerts.html" class="bottom-nav-item"><span class="nav-icon">⚠️</span>Alerts</a>
+    <a href="chat.html" class="bottom-nav-item"><span class="nav-icon">🤖</span>AI Chat</a>
+    <a href="map.html" class="bottom-nav-item active"><span class="nav-icon">🗺️</span>Map</a>
+  </div>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/location.js"></script>
+<script src="js/alerts.js"></script>
+<script>
+LangManager.init();
+LocationService.init();
+AlertService.init();
+
+let map, userMarker, alertLayers = [], rainfallLayers = [];
+
+function initMap() {
+  const loc = LocationService.current;
+  const center = loc ? [loc.lat || 20.5937, loc.lon || 78.9629] : [20.5937, 78.9629];
+
+  map = L.map('weather-map', {
+    center: center,
+    zoom: loc ? 7 : 5,
+    zoomControl: true,
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(map);
+
+  // User location marker
+  if (loc && loc.lat) {
+    const icon = L.divIcon({
+      html: '<div style="background:#1565C0;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
+      className: '',
+      iconSize: [20,20],
+      iconAnchor: [10,10],
+    });
+    userMarker = L.marker([loc.lat, loc.lon], { icon }).addTo(map);
+    userMarker.bindPopup(`<strong>📍 Your Location</strong><br>${loc.city}, ${loc.state}`).openPopup();
+  }
+
+  loadAlertZones();
+}
+
+async function loadAlertZones() {
+  const alerts = await AlertService.getAllAlerts();
+  const sevColors = {
+    EMERGENCY: { fill: 'rgba(183,28,28,0.25)', border: '#B71C1C' },
+    WARNING:   { fill: 'rgba(230,81,0,0.2)',   border: '#E65100' },
+    ADVISORY:  { fill: 'rgba(239,108,0,0.15)', border: '#EF6C00' },
+    WATCH:     { fill: 'rgba(249,168,37,0.15)',border: '#F9A825' },
+  };
+
+  alerts.forEach(alert => {
+    if (!alert.lat || !alert.lon) return;
+    const c = sevColors[alert.severity] || sevColors.WATCH;
+    const circle = L.circle([alert.lat, alert.lon], {
+      radius: (alert.radius_km || 100) * 1000,
+      fillColor: c.fill,
+      color: c.border,
+      weight: 2,
+      fillOpacity: 0.4,
+    }).addTo(map);
+
+    const haz = MS_CONFIG.HAZARD[alert.hazard];
+    circle.bindPopup(`
+      <strong>${haz?.icon || '⚠️'} ${alert.title}</strong><br>
+      <span style="color:${c.border};font-weight:700">${alert.severity}</span><br>
+      📍 ${alert.area}<br>
+      <em style="font-size:11px;color:#888">⚠️ DEMO SIMULATION — Not real boundary</em><br>
+      <a href="alerts.html" style="color:#1565C0">View Details →</a>
+    `);
+    alertLayers.push(circle);
+  });
+
+  // Rainfall overlay (demo)
+  const rainfallAreas = [
+    { lat: 19.076, lon: 72.877, radius: 80000, label: 'Heavy Rain — Mumbai Region' },
+    { lat: 20.296, lon: 85.824, radius: 120000, label: 'Extreme Rain — Odisha Coast' },
+  ];
+  rainfallAreas.forEach(r => {
+    const circle = L.circle([r.lat, r.lon], {
+      radius: r.radius,
+      fillColor: 'rgba(21,101,192,0.15)',
+      color: '#1565C0',
+      weight: 1.5,
+      fillOpacity: 0.3,
+      dashArray: '5 5',
+    }).addTo(map);
+    circle.bindPopup(`<strong>🌧️ ${r.label}</strong><br><em style="font-size:11px;color:#888">DEMO DATA</em>`);
+    rainfallLayers.push(circle);
+  });
+
+  renderMapAlertsList(alerts);
+}
+
+function renderMapAlertsList(alerts) {
+  document.getElementById('map-alerts-list').innerHTML = alerts.map(a => {
+    const sev = MS_CONFIG.SEVERITY[a.severity];
+    const haz = MS_CONFIG.HAZARD[a.hazard];
+    return `
+      <div class="card" style="cursor:pointer;border-left:4px solid ${sev.border}" onclick="flyToAlert(${a.lat},${a.lon})">
+        <div class="card-body" style="padding:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:20px">${haz?.icon || '⚠️'}</span>
+            <span class="alert-severity-badge severity-${a.severity.toLowerCase()}">${sev.label}</span>
+            <span class="demo-badge" style="margin-left:auto">SIM</span>
+          </div>
+          <div style="font-weight:700;font-size:var(--text-sm);margin-bottom:4px">${a.title}</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted)">📍 ${a.area}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function flyToAlert(lat, lon) {
+  if (map && lat && lon) {
+    map.flyTo([lat, lon], 7, { duration: 1 });
+  }
+}
+
+function showLayer(layer) {
+  if (layer === 'user' && userMarker) {
+    const latLng = userMarker.getLatLng();
+    map.flyTo(latLng, 10, { duration: 1 });
+  }
+}
+
+function resetView() {
+  map.setView([20.5937, 78.9629], 5);
+}
+
+initMap();
+</script>
+</body>
+</html>

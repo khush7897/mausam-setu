@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Alerts — Mausam Setu</title>
+  <meta name="description" content="Active weather and disaster alerts for your area — flood, cyclone, heatwave, lightning and more.">
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="page-wrapper">
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">Alert Center</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link active">⚠️ Alerts</a>
+      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link">🗺️ Map</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en');renderAlerts()">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi');renderAlerts()">हिं</button>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn">☰</button>
+    </div>
+  </div>
+</nav>
+<div class="demo-ribbon">⚠️ DEMO MODE</div>
+
+<main class="main-content">
+  <div class="container">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 style="font-size:var(--text-3xl);display:flex;align-items:center;gap:10px" data-t="alerts_title">
+          ⚠️ Weather & Disaster Alerts
+        </h1>
+        <p style="color:var(--text-muted);margin-top:4px" id="location-subtitle">For your area</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="demo-badge">🔬 SIMULATION</span>
+        <span id="alert-count-badge" style="background:var(--warning-bg);color:var(--warning-text);font-size:var(--text-sm);font-weight:700;padding:6px 14px;border-radius:var(--radius-full)">Loading...</span>
+        <button onclick="loadAlerts()" class="btn btn-outline btn-sm">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Demo Notice -->
+    <div class="demo-mode-notice" style="margin-bottom:var(--space-6)">
+      <span class="demo-mode-notice-icon">🔬</span>
+      <div class="demo-mode-notice-text">
+        <strong>SIMULATION ALERTS — Not Real Government Warnings</strong>
+        These are demo scenarios for SIH 2026 demonstration purposes only. In production, alerts will come from IMD and NDMA official APIs.
+      </div>
+    </div>
+
+    <!-- All Clear or Active -->
+    <div id="all-clear-section" class="hidden" style="margin-bottom:var(--space-6)">
+      <div style="background:var(--success-bg);border:2px solid #A5D6A7;border-radius:var(--radius-lg);padding:var(--space-8);text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">✅</div>
+        <h2 style="color:var(--success);margin-bottom:8px" data-t="alerts_all_clear">All Clear — No active weather hazards</h2>
+        <p style="color:var(--text-muted);font-size:var(--text-sm)">No weather warnings are currently issued for your area. Stay informed and check back regularly.</p>
+      </div>
+    </div>
+
+    <!-- Alerts by Severity -->
+    <div id="alerts-container">
+      <div style="text-align:center;padding:40px">
+        <div class="spinner spinner-lg" style="margin:0 auto 16px"></div>
+        <p style="color:var(--text-muted)">Loading alerts...</p>
+      </div>
+    </div>
+
+    <!-- Demo Controls (SIH Demo) -->
+    <div class="card" style="margin-top:var(--space-8)">
+      <div class="card-header">
+        <div class="card-title">🎭 SIH Demo — Trigger Alert Scenarios</div>
+        <span class="demo-badge">DEMO CONTROLS</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:16px">These controls are for SIH 2026 demonstration only. Simulate different alert scenarios.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button onclick="filterAlerts('ALL')" class="btn btn-primary btn-sm" id="filter-all">All Alerts</button>
+          <button onclick="filterAlerts('EMERGENCY')" class="btn btn-sm" style="background:var(--emergency-bg);color:var(--emergency-text);border:1px solid var(--emergency-border)">🚨 Emergency</button>
+          <button onclick="filterAlerts('WARNING')" class="btn btn-sm" style="background:var(--warning-bg);color:var(--warning-text);border:1px solid var(--warning-border)">🔴 Warning</button>
+          <button onclick="filterAlerts('ADVISORY')" class="btn btn-sm" style="background:var(--advisory-bg);color:var(--advisory-text);border:1px solid var(--advisory-border)">🟠 Advisory</button>
+          <button onclick="filterAlerts('WATCH')" class="btn btn-sm" style="background:var(--watch-bg);color:var(--watch-text);border:1px solid var(--watch-border)">🟡 Watch</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety Section -->
+    <div style="margin-top:var(--space-8)">
+      <h2 style="margin-bottom:var(--space-4)">🛡️ General Safety During Weather Events</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-4)" id="safety-grid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="forecast.html" class="bottom-nav-item"><span class="nav-icon">📅</span>Forecast</a>
+    <a href="alerts.html" class="bottom-nav-item active"><span class="nav-icon">⚠️</span>Alerts</a>
+    <a href="chat.html" class="bottom-nav-item"><span class="nav-icon">🤖</span>AI Chat</a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span>Map</a>
+  </div>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/location.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/safety.js"></script>
+<script>
+LangManager.init();
+AlertService.init();
+LocationService.init();
+
+let allAlerts = [];
+let currentFilter = 'ALL';
+
+async function loadAlerts() {
+  allAlerts = await AlertService.getAllAlerts();
+  const loc = LocationService.current;
+  if (loc) {
+    document.getElementById('location-subtitle').textContent =
+      'For: ' + [loc.city, loc.state].filter(Boolean).join(', ');
+  }
+  renderAlerts();
+  renderSafetyGrid();
+}
+
+function renderAlerts() {
+  const lang = LangManager.current;
+  const filtered = currentFilter === 'ALL' ? allAlerts
+    : allAlerts.filter(a => a.severity === currentFilter);
+
+  const badge = document.getElementById('alert-count-badge');
+  badge.textContent = filtered.length + ' Active Alert' + (filtered.length !== 1 ? 's' : '');
+
+  if (filtered.length === 0) {
+    Utils.show('all-clear-section');
+    document.getElementById('alerts-container').innerHTML = '';
+    return;
+  }
+
+  Utils.hide('all-clear-section');
+
+  // Sort by severity (highest first)
+  const order = { EMERGENCY: 4, WARNING: 3, ADVISORY: 2, WATCH: 1 };
+  const sorted = [...filtered].sort((a,b) => (order[b.severity]||0) - (order[a.severity]||0));
+
+  document.getElementById('alerts-container').innerHTML = sorted.map(a =>
+    AlertService.formatAlertCard(a, lang)
+  ).join('');
+}
+
+function filterAlerts(sev) {
+  currentFilter = sev;
+  renderAlerts();
+}
+
+function renderSafetyGrid() {
+  const hazards = ['FLOOD','LIGHTNING','HEATWAVE','CYCLONE','HEAVY_RAIN','STRONG_WIND'];
+  const lang = LangManager.current;
+  document.getElementById('safety-grid').innerHTML = hazards.map(h => {
+    const adv = SafetyEngine.getAdvisory(h, lang);
+    return `
+      <div class="card" style="cursor:default">
+        <div class="card-header" style="padding:16px">
+          <div class="card-title" style="font-size:var(--text-base)">
+            <span>${adv.icon}</span> ${adv.title}
+          </div>
+        </div>
+        <div class="card-body" style="padding:16px">
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
+            ${adv.tips.slice(0,3).map(t => `<li style="font-size:var(--text-xs);color:var(--text-secondary);display:flex;gap:6px"><span>•</span><span>${t}</span></li>`).join('')}
+          </ul>
+          ${adv.emergency ? `<div style="margin-top:10px;font-size:var(--text-xs);font-weight:600;color:var(--warning-text)">📞 ${adv.emergency}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+loadAlerts();
+
+// Hamburger
+document.getElementById('hamburger-btn').addEventListener('click', function() {
+  // mobile menu toggle
+});
+</script>
+</body>
+</html>

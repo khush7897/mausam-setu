@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile & Settings — Mausam Setu</title>
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="page-wrapper">
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">Profile</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <div class="container" style="max-width:720px">
+    <h1 style="font-size:var(--text-3xl);margin-bottom:var(--space-6)" data-t="profile_title">👤 Profile & Settings</h1>
+
+    <!-- Profile Card -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">Personal Information</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">
+          <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--primary-600),var(--primary-400));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white" id="profile-avatar">U</div>
+          <div>
+            <div style="font-size:var(--text-xl);font-weight:700" id="profile-name-display">Loading...</div>
+            <div style="font-size:var(--text-sm);color:var(--text-muted)" id="profile-role-display">--</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px" id="profile-mobile-display">--</div>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-t="profile_name">Full Name</label>
+            <input type="text" class="form-input" id="pref-name" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-t="profile_mobile">Mobile Number</label>
+            <input type="text" class="form-input" id="pref-mobile" placeholder="Mobile" readonly style="background:var(--gray-50)">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-t="profile_language">Preferred Language</label>
+            <select class="form-input form-select" id="pref-lang" onchange="LangManager.setLanguage(this.value)">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-t="profile_role">Account Type</label>
+            <select class="form-input form-select" id="pref-role">
+              <option value="citizen">General Citizen</option>
+              <option value="farmer">Farmer</option>
+              <option value="fisherman">Fisherman</option>
+              <option value="student">Student</option>
+              <option value="official">Disaster Management Official</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">📍 Saved Location</div>
+        <a href="dashboard.html" class="btn btn-ghost btn-sm" data-t="btn_change_location">Change Location</a>
+      </div>
+      <div class="card-body">
+        <div id="saved-location-display" style="font-size:var(--text-base);color:var(--text-primary)">Loading...</div>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:8px">Your location is used for weather data and alert matching. You can change it any time from the Dashboard.</p>
+      </div>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">🔔 <span data-t="profile_notifications">Notification Settings</span></div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:600;font-size:var(--text-sm)" data-t="profile_notif_app">In-App Notifications</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">Alerts shown while using the app</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notif-app" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:600;font-size:var(--text-sm)" data-t="profile_notif_browser">Browser Push Notifications</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">Receive alerts even when app is not open</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notif-browser" onchange="toggleBrowserNotif(this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;opacity:0.6">
+          <div>
+            <div style="font-weight:600;font-size:var(--text-sm)" data-t="profile_notif_sms">SMS Alerts</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">Coming Soon — Provider Integration Pending</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notif-sms" disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;opacity:0.6">
+          <div>
+            <div style="font-weight:600;font-size:var(--text-sm)" data-t="profile_notif_whatsapp">WhatsApp Alerts</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">Coming Soon — Provider Integration Pending</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notif-whatsapp" disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Preferences -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">⚠️ Alert Preferences</div>
+      </div>
+      <div class="card-body">
+        <p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:16px">Select which types of alerts you want to receive:</p>
+        <div class="form-row-2" style="gap:12px">
+          ${Object.entries(MS_CONFIG?.HAZARD || {}).map(([k,v]) => `
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:var(--text-sm)">
+              <input type="checkbox" class="checkbox-input" value="${k}" checked>
+              <span>${v.icon} ${v.label}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- System Permissions Status -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">🛡️ System Permissions & Access Status</div>
+        <button onclick="PermissionsManager.resetPermissions()" class="btn btn-outline btn-sm">🔄 Re-configure Permissions</button>
+      </div>
+      <div class="card-body">
+        <div class="form-row-2">
+          <div style="padding:12px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--border)">
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">📍 GPS Location</div>
+            <div style="font-weight:700;font-size:var(--text-sm);color:var(--success);margin-top:2px" id="perm-gps-summary">Authorized</div>
+          </div>
+          <div style="padding:12px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--border)">
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">📱 Alert Phone Number</div>
+            <div style="font-weight:700;font-size:var(--text-sm);color:var(--primary-800);margin-top:2px" id="perm-phone-summary">Configured</div>
+          </div>
+          <div style="padding:12px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--border)">
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">🎙️ Microphone (Voice)</div>
+            <div style="font-weight:700;font-size:var(--text-sm);color:var(--primary-800);margin-top:2px" id="perm-mic-summary">Active</div>
+          </div>
+          <div style="padding:12px;background:var(--gray-50);border-radius:var(--radius);border:1px solid var(--border)">
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">🔔 Push / SMS Broadcasts</div>
+            <div style="font-weight:700;font-size:var(--text-sm);color:var(--success);margin-top:2px" id="perm-notif-summary">Active</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-lg" onclick="saveProfile()" id="save-btn">
+        💾 Save Changes
+      </button>
+      <button class="btn btn-ghost btn-lg" onclick="AuthService.logout()">
+        🚪 Logout
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/location.js"></script>
+<script src="js/location.js"></script>
+<script>
+LangManager.init();
+AuthService.init();
+LocationService.init();
+
+// Populate profile
+const user = AuthService.currentUser;
+if (user) {
+  document.getElementById('profile-avatar').textContent = AuthService.getUserInitials();
+  document.getElementById('profile-name-display').textContent = user.name;
+  document.getElementById('profile-role-display').textContent = user.role?.charAt(0).toUpperCase() + user.role?.slice(1);
+  document.getElementById('profile-mobile-display').textContent = user.mobile;
+  document.getElementById('pref-name').value = user.name;
+  document.getElementById('pref-mobile').value = user.mobile;
+  document.getElementById('pref-role').value = user.role || 'citizen';
+}
+
+// Language
+document.getElementById('pref-lang').value = LangManager.current;
+
+// Location
+const loc = LocationService.current;
+document.getElementById('saved-location-display').textContent = loc ?
+  [loc.city, loc.district, loc.state].filter(Boolean).join(', ') : 'No location saved — set it from the Dashboard.';
+
+// Permissions Summary
+const savedPerms = (typeof PermissionsManager !== 'undefined') ? PermissionsManager.getSavedPermissions() : null;
+if (savedPerms) {
+  const elGps = document.getElementById('perm-gps-summary');
+  const elPhone = document.getElementById('perm-phone-summary');
+  const elMic = document.getElementById('perm-mic-summary');
+  const elNotif = document.getElementById('perm-notif-summary');
+
+  if (elGps) {
+    elGps.textContent = savedPerms.gps ? '✓ Authorized' : 'Not Granted';
+    elGps.style.color = savedPerms.gps ? 'var(--success)' : '#C62828';
+  }
+  if (elPhone) {
+    elPhone.textContent = savedPerms.phone ? '+91 ' + savedPerms.phone : 'Not Set';
+  }
+  if (elMic) {
+    elMic.textContent = savedPerms.mic ? '✓ Active' : 'Not Enabled';
+    elMic.style.color = savedPerms.mic ? 'var(--success)' : 'var(--text-muted)';
+  }
+  if (elNotif) {
+    elNotif.textContent = savedPerms.notifications ? '✓ Active' : 'In-App Only';
+    elNotif.style.color = savedPerms.notifications ? 'var(--success)' : 'var(--text-muted)';
+  }
+}
+
+// Hazard options
+if (typeof MS_CONFIG !== 'undefined' && MS_CONFIG.HAZARD) {
+  // Already rendered inline with template literal above
+}
+
+function saveProfile() {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saving...';
+
+  const user = AuthService.currentUser;
+  if (user) {
+    user.name = document.getElementById('pref-name').value || user.name;
+    user.role = document.getElementById('pref-role').value;
+    Utils.store(MS_CONFIG.STORAGE.USER, user);
+  }
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = '💾 Save Changes';
+    Utils.showToast('Settings saved successfully!', 'success');
+  }, 800);
+}
+
+async function toggleBrowserNotif(checkbox) {
+  if (checkbox.checked) {
+    const granted = await NotificationService?.requestBrowserPermission?.() || false;
+    if (!granted) {
+      checkbox.checked = false;
+      Utils.showToast('Browser notification permission denied.', 'warning');
+    } else {
+      Utils.showToast('Browser notifications enabled!', 'success');
+    }
+  }
+}
+</script>
+</body>
+</html>

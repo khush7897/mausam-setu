@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Mode — Mausam Setu</title>
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="page-wrapper">
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">Farmer Mode</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="farmer.html" class="nav-link active">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link">⚓ Fisherman</a>
+      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en');renderFarmerPage()">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi');renderFarmerPage()">हिं</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="demo-ribbon">⚠️ DEMO MODE</div>
+
+<main class="main-content">
+  <div class="container">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:var(--radius-lg);padding:var(--space-8);color:white;margin-bottom:var(--space-6)">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <span style="font-size:56px">🌾</span>
+        <div>
+          <h1 style="color:white;margin-bottom:6px" data-t="farmer_title">Farmer Weather Dashboard</h1>
+          <p style="color:rgba(255,255,255,0.8)" data-t="farmer_subtitle">Weather information for agricultural planning</p>
+          <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="demo-badge">⚠️ DEMO DATA</span>
+            <span style="background:rgba(255,255,255,0.15);color:white;font-size:var(--text-xs);font-weight:700;padding:3px 10px;border-radius:var(--radius-full)" id="farmer-location">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="background:var(--info-bg);border:1px solid var(--primary-200);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:var(--space-6);font-size:var(--text-sm);color:var(--primary-700)">
+      ⚠️ <span data-t="farmer_disclaimer">Agricultural advisories are based on weather data. Consult local agricultural officers for crop-specific guidance.</span>
+    </div>
+
+    <!-- Weather Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4);margin-bottom:var(--space-6)" id="farmer-stats">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+
+    <!-- Advisory -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">🌾 <span data-t="farmer_advisory">Agricultural Advisory</span></div>
+        <span class="demo-badge">⚠️ DEMO</span>
+      </div>
+      <div class="card-body" id="farmer-advisory">
+        <div class="spinner" style="margin:20px auto"></div>
+      </div>
+    </div>
+
+    <!-- 5-Day Forecast for Farmers -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">📅 5-Day Agricultural Outlook</div>
+      </div>
+      <div class="card-body" id="farmer-forecast" style="padding:0">
+        <div class="spinner" style="margin:20px auto"></div>
+      </div>
+    </div>
+
+    <!-- Safety -->
+    <div id="farmer-safety"></div>
+
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="farmer.html" class="bottom-nav-item active"><span class="nav-icon">🌾</span>Farmer</a>
+    <a href="fisherman.html" class="bottom-nav-item"><span class="nav-icon">⚓</span>Fisherman</a>
+    <a href="chat.html" class="bottom-nav-item"><span class="nav-icon">🤖</span>AI Chat</a>
+    <a href="alerts.html" class="bottom-nav-item"><span class="nav-icon">⚠️</span>Alerts</a>
+  </div>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/location.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/safety.js"></script>
+<script>
+LangManager.init();
+LocationService.init();
+AlertService.init();
+
+let currentWeather = null, currentForecast = null;
+
+async function loadFarmerPage() {
+  const loc = LocationService.current || { city:'Delhi', state:'Delhi', lat:28.61, lon:77.20 };
+  document.getElementById('farmer-location').textContent = [loc.city, loc.state].filter(Boolean).join(', ');
+
+  const [weather, forecast, alerts] = await Promise.all([
+    WeatherService.getCurrentWeather(loc.city, loc.lat, loc.lon),
+    WeatherService.getForecast(loc.city, loc.lat, loc.lon),
+    AlertService.getAlertsForLocation(loc.lat, loc.lon, loc.state),
+  ]);
+
+  currentWeather = weather;
+  currentForecast = forecast;
+  renderFarmerPage(weather, forecast, alerts);
+}
+
+function renderFarmerPage(w, f, alerts) {
+  w = w || currentWeather;
+  f = f || currentForecast;
+  if (!w) return;
+
+  const lang = LangManager.current;
+  const rainNext3 = f ? f.slice(0,3).reduce((s,d) => s + d.rain_mm, 0) : 0;
+
+  // Stats
+  document.getElementById('farmer-stats').innerHTML = `
+    <div class="card">
+      <div class="card-body" style="text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🌡️</div>
+        <div style="font-size:var(--text-2xl);font-weight:700;color:${Utils.tempColor(w.temp)}">${w.temp}°C</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">${lang==='hi'?'तापमान':'Temperature'}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px">${lang==='hi'?'न्यूनतम':'Min'}: ${w.temp-6}° / ${lang==='hi'?'अधिकतम':'Max'}: ${w.temp+2}°</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🌧️</div>
+        <div style="font-size:var(--text-2xl);font-weight:700;color:${Utils.rainLabel(w.rain_prob).color}">${w.rain_prob}%</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">${lang==='hi'?'वर्षा संभावना':'Rain Probability'}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px">Next 3d: ${Math.round(rainNext3)}mm</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">💧</div>
+        <div style="font-size:var(--text-2xl);font-weight:700">${w.humidity}%</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">${lang==='hi'?'आर्द्रता':'Humidity'}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px">${w.humidity>80?'High':'Normal'}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">💨</div>
+        <div style="font-size:var(--text-2xl);font-weight:700">${w.wind_speed}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">${lang==='hi'?'हवा km/h':'Wind km/h'}</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px">${Utils.windBeaufort(w.wind_speed).desc}</div>
+      </div>
+    </div>
+  `;
+
+  // Advisory
+  const advisory = generateFarmerAdvisory(w, f, lang);
+  document.getElementById('farmer-advisory').innerHTML = advisory;
+
+  // Forecast
+  if (f) {
+    document.getElementById('farmer-forecast').innerHTML = f.slice(0,5).map(d => `
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border-light)">
+        <div style="width:90px;font-weight:600;font-size:var(--text-sm)">${d.day}</div>
+        <div style="font-size:24px">${Utils.getWeatherIcon(d.condition)}</div>
+        <div style="flex:1">
+          <div style="font-size:var(--text-sm);font-weight:600">${d.condition}</div>
+          <div style="font-size:var(--text-xs);color:${Utils.rainLabel(d.rain_prob).color};font-weight:600;margin-top:2px">
+            🌧️ Rain: ${d.rain_prob}% ${d.rain_mm>0?`(${d.rain_mm}mm)`:''}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700">${d.temp_max}° / ${d.temp_min}°</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">
+            ${getFarmingRecommendation(d, lang)}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Safety
+  document.getElementById('farmer-safety').innerHTML = SafetyEngine.renderSafetyCard(
+    w.rain_prob > 70 ? 'HEAVY_RAIN' : w.temp > 42 ? 'HEATWAVE' : 'GENERAL', lang, w.rain_prob > 70
+  );
+}
+
+function generateFarmerAdvisory(w, f, lang) {
+  const rainHigh = w.rain_prob > 65;
+  const heatHigh = w.temp > 40;
+  const dryConditions = w.rain_prob < 20;
+
+  if (lang === 'hi') {
+    if (rainHigh) return `
+      <div style="color:var(--advisory-text)">
+        <p><strong>⚠️ भारी वर्षा की चेतावनी:</strong></p>
+        <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+          <li>अगले 2-3 दिनों में फसल कटाई टालें।</li>
+          <li>कटी हुई फसल को ढककर रखें।</li>
+          <li>खेतों में जल निकासी सुनिश्चित करें।</li>
+          <li>कीटनाशक और उर्वरक का छिड़काव बारिश के बाद करें।</li>
+        </ul>
+        <div style="margin-top:12px;font-size:var(--text-xs);color:var(--text-muted)">⚠️ फसल-विशिष्ट सलाह के लिए KCC: 1551 पर कॉल करें।</div>
+      </div>`;
+    if (heatHigh) return `
+      <div style="color:var(--warning-text)">
+        <p><strong>🌡️ अत्यधिक गर्मी की चेतावनी:</strong></p>
+        <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+          <li>फसलों में सिंचाई बढ़ाएं — दोपहर से पहले या शाम को।</li>
+          <li>मजदूरों को दोपहर 12-4 बजे काम से बचाएं।</li>
+          <li>खेत में छाया और पानी की व्यवस्था करें।</li>
+        </ul>
+      </div>`;
+    return `
+      <div style="color:var(--success)">
+        <p><strong>✅ मौसम की स्थिति सामान्य है।</strong></p>
+        <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+          <li>सामान्य कृषि गतिविधियां जारी रखी जा सकती हैं।</li>
+          <li>${dryConditions ? 'शुष्क परिस्थितियां — सिंचाई योजना बनाएं।' : 'मध्यम मौसम — बुवाई/कटाई के लिए उपयुक्त।'}</li>
+        </ul>
+        <div style="margin-top:12px;font-size:var(--text-xs);color:var(--text-muted)">KCC हेल्पलाइन: 1551</div>
+      </div>`;
+  }
+
+  if (rainHigh) return `
+    <div style="color:var(--advisory-text)">
+      <p><strong>⚠️ Heavy Rainfall Advisory for Farmers:</strong></p>
+      <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+        <li>Postpone harvesting operations for 2–3 days.</li>
+        <li>Cover/protect harvested produce from rain damage.</li>
+        <li>Ensure proper field drainage to prevent waterlogging.</li>
+        <li>Delay pesticide/fertilizer application until after rainfall.</li>
+      </ul>
+      <div style="margin-top:12px;font-size:var(--text-xs);color:var(--text-muted)">⚠️ For crop-specific advice: Kisan Call Centre 1551</div>
+    </div>`;
+  if (heatHigh) return `
+    <div style="color:var(--warning-text)">
+      <p><strong>🌡️ Extreme Heat Advisory for Farmers:</strong></p>
+      <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+        <li>Increase irrigation frequency — water before noon or in evening.</li>
+        <li>Protect farm workers from heat: no work 12 PM – 4 PM.</li>
+        <li>Ensure shade and drinking water availability in the field.</li>
+      </ul>
+    </div>`;
+  return `
+    <div style="color:var(--success)">
+      <p><strong>✅ Weather conditions are generally suitable for farming.</strong></p>
+      <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">
+        <li>Normal agricultural operations can continue.</li>
+        <li>${dryConditions ? 'Dry conditions expected — plan irrigation accordingly.' : 'Moderate weather — suitable for sowing/harvesting operations.'}</li>
+      </ul>
+      <div style="margin-top:12px;font-size:var(--text-xs);color:var(--text-muted)">Kisan Call Centre: 1551</div>
+    </div>`;
+}
+
+function getFarmingRecommendation(d, lang) {
+  if (d.rain_prob > 70) return lang==='hi'?'❌ कटाई टालें':'❌ Postpone harvest';
+  if (d.rain_prob > 40) return lang==='hi'?'⚠️ सतर्क रहें':'⚠️ Be cautious';
+  return lang==='hi'?'✅ कृषि अनुकूल':'✅ Farm-friendly';
+}
+
+loadFarmerPage();
+</script>
+</body>
+</html>

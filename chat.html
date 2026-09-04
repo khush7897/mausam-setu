@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeatherGPT — Mausam Setu</title>
+  <meta name="description" content="Ask WeatherGPT about rain, floods, heatwaves, travel safety, and more in English or Hindi.">
+  <link rel="icon" type="image/png" href="assets/logo-transparent.png">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="page-wrapper" style="background:var(--gray-50)">
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub">WeatherGPT</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+      <a href="chat.html" class="nav-link active">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link">🗺️ Map</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en');WeatherGPT._weather=null">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi');WeatherGPT._weather=null">हिं</button>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn">☰</button>
+    </div>
+  </div>
+</nav>
+<div class="demo-ribbon">⚠️ DEMO MODE</div>
+
+<main class="main-content" style="padding-bottom:0">
+  <div class="chat-page-container">
+
+    <!-- Header -->
+    <div style="padding:var(--space-5) 0 var(--space-4);border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1 style="font-size:var(--text-2xl);display:flex;align-items:center;gap:10px" data-t="chat_title">
+            🤖 WeatherGPT — Your AI Weather Assistant
+          </h1>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);margin-top:4px" data-t="chat_subtitle">
+            Ask me anything about weather, alerts, or safety
+          </p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="demo-badge">⚠️ DEMO DATA</span>
+          <span id="weather-context-badge" style="background:var(--success-bg);color:var(--success);font-size:var(--text-xs);font-weight:600;padding:4px 10px;border-radius:var(--radius-full)">
+            ⏳ Loading context...
+          </span>
+          <button onclick="clearChat()" class="btn btn-ghost btn-sm">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div style="margin-top:10px;background:var(--warning-bg);border:1px solid var(--watch-border);border-radius:var(--radius);padding:8px 12px;font-size:var(--text-xs);color:var(--advisory-text);display:flex;align-items:flex-start;gap:8px">
+        <span>⚠️</span>
+        <span data-t="chat_disclaimer">WeatherGPT provides information based on available weather data. Always follow official advisories in emergencies.</span>
+      </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chat-messages" style="flex:1;overflow-y:auto;padding:var(--space-4) 0">
+      <!-- Initial bot message -->
+      <div class="chat-msg bot">
+        <div class="chat-avatar">🤖</div>
+        <div class="chat-bubble">
+          <strong>🙏 Namaste! I'm WeatherGPT.</strong><br><br>
+          I can help you with real-time weather information, active alerts, and safety guidance for your area.<br><br>
+          📡 <em>All my responses are grounded in verified weather data — I will never guess or invent weather conditions.</em><br><br>
+          <strong>Try asking:</strong> "Will it rain today?" or "Is it safe to travel?"
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="chat-suggestions" id="suggestions-area">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area" style="flex-shrink:0">
+      <textarea
+        id="chat-input"
+        class="chat-input"
+        data-t-placeholder="chat_placeholder"
+        placeholder="Ask about weather, alerts, or safety..."
+        rows="1"
+        aria-label="Chat message input"
+        onkeydown="handleChatKey(event)"
+        oninput="autoGrow(this)"
+      ></textarea>
+      <button class="chat-send-btn" id="send-btn" onclick="sendMessage()" aria-label="Send message">➤</button>
+    </div>
+
+    <!-- Source Attribution -->
+    <div style="text-align:center;padding:8px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border-light);flex-shrink:0">
+      📡 Data: DEMO MODE (Simulated) · For real weather: <a href="https://mausam.imd.gov.in" target="_blank" style="color:var(--primary-500)">mausam.imd.gov.in</a>
+    </div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
+    <a href="forecast.html" class="bottom-nav-item"><span class="nav-icon">📅</span>Forecast</a>
+    <a href="alerts.html" class="bottom-nav-item"><span class="nav-icon">⚠️</span>Alerts</a>
+    <a href="chat.html" class="bottom-nav-item active"><span class="nav-icon">🤖</span>AI Chat</a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span>Map</a>
+  </div>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/permissions.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/location.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/safety.js"></script>
+<script src="js/chat.js"></script>
+<script>
+LangManager.init();
+AuthService.init();
+AlertService.init();
+
+// Load context and suggestions
+async function initChat() {
+  await WeatherGPT.loadContext();
+  const loc = WeatherGPT._location;
+  const badge = document.getElementById('weather-context-badge');
+  if (WeatherGPT._weather) {
+    badge.style.background = 'var(--success-bg)';
+    badge.style.color = 'var(--success)';
+    badge.textContent = '✅ Context: ' + (loc?.city || 'Location loaded');
+  } else {
+    badge.style.background = 'var(--warning-bg)';
+    badge.style.color = 'var(--advisory-text)';
+    badge.textContent = '⚠️ No location set';
+    addBotMessage("I noticed your location isn't set. Using default demo data. <a href='dashboard.html' style='color:var(--primary-500)'>Set your location in the Dashboard →</a>");
+  }
+  renderSuggestions();
+}
+
+function renderSuggestions() {
+  const lang = LangManager.current;
+  const suggs = lang === 'hi' ? T.hi.chat_suggestions : T.en.chat_suggestions;
+  document.getElementById('suggestions-area').innerHTML = (suggs||[]).map(s => `
+    <button class="chat-suggestion-btn" onclick="sendSuggestion('${s.replace(/'/g,"\\'")}')">${s}</button>
+  `).join('');
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function addUserMessage(text) {
+  const container = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg user';
+  msg.innerHTML = `<div class="chat-avatar">👤</div><div class="chat-bubble">${escHTML(text)}</div>`;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addBotMessage(html, isThinking = false) {
+  const container = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg bot';
+  msg.innerHTML = `
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-bubble">${isThinking ? '<span style="color:var(--text-muted);font-style:italic">⏳ Analysing weather data...</span>' : html}</div>
+  `;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+  return msg;
+}
+
+function escHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('send-btn').disabled = true;
+
+  addUserMessage(text);
+  const thinkingMsg = addBotMessage('', true);
+
+  try {
+    const response = await WeatherGPT.getResponse(text, LangManager.current);
+    const bubble = thinkingMsg.querySelector('.chat-bubble');
+    bubble.innerHTML = WeatherGPT.formatMessage(response);
+  } catch(e) {
+    const bubble = thinkingMsg.querySelector('.chat-bubble');
+    bubble.innerHTML = LangManager.t('chat_data_unavailable');
+  }
+
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('chat-messages').scrollTop = 99999;
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function clearChat() {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = `
+    <div class="chat-msg bot">
+      <div class="chat-avatar">🤖</div>
+      <div class="chat-bubble"><strong>Chat cleared.</strong> How can I help you with weather today?</div>
+    </div>`;
+}
+
+initChat();
+</script>
+</body>
+</html>
