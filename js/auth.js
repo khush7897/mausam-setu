@@ -1,17 +1,13 @@
 /**
  * MAUSAM SETU — Authentication Service
- * Uses localStorage for demo mode. Production would use server auth.
+ * Uses Express backend API with MySQL/MariaDB for production authentication.
+ * Server runs on http://localhost:5000
  */
 
 const AuthService = {
 
-  // ── Demo accounts ─────────────────────────────────────────
-  DEMO_USERS: [
-    { id: 'U001', name: 'Arjun Singh', mobile: '9876543210', email: 'user@demo.com',    password: 'demo123', role: 'citizen',  state: 'Delhi' },
-    { id: 'U002', name: 'Priya Patel', mobile: '9123456789', email: 'farmer@demo.com',  password: 'demo123', role: 'farmer',   state: 'Gujarat' },
-    { id: 'U003', name: 'Rajan Kumar', mobile: '9012345678', email: 'fish@demo.com',    password: 'demo123', role: 'fisherman', state: 'Tamil Nadu' },
-    { id: 'ADM1', name: 'Admin User',  mobile: '9000000000', email: 'admin@mausam.gov', password: 'admin123', role: 'admin', state: 'Delhi' },
-  ],
+  // ── Backend API Configuration ─────────────────────────────
+  API_BASE_URL: 'http://localhost:5000/api/auth',
 
   // ── Current user ──────────────────────────────────────────
   currentUser: null,
@@ -25,54 +21,66 @@ const AuthService = {
 
   // ── Login ─────────────────────────────────────────────────
   async login(identifier, password) {
-    await this._delay(500); // Simulate network
+    try {
+      const response = await fetch(`${this.API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ identifier, password }),
+      });
 
-    const user = this.DEMO_USERS.find(u =>
-      (u.mobile === identifier || u.email === identifier.toLowerCase()) &&
-      u.password === password
-    );
+      const result = await response.json();
 
-    if (!user) {
-      return { success: false, error: 'Invalid mobile/email or password. Try: user@demo.com / demo123' };
+      if (!result.success) {
+        return { success: false, error: result.error || 'Login failed. Please try again.' };
+      }
+
+      // Store user session
+      this.currentUser = result.user;
+      Utils.store(MS_CONFIG.STORAGE.USER, result.user);
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'Network error. Please check your connection and try again.' };
     }
-
-    const session = {
-      id: user.id,
-      name: user.name,
-      mobile: user.mobile,
-      email: user.email,
-      role: user.role,
-      state: user.state,
-      loginAt: Date.now(),
-    };
-
-    this.currentUser = session;
-    Utils.store(MS_CONFIG.STORAGE.USER, session);
-    return { success: true, user: session };
   },
 
   // ── Register ──────────────────────────────────────────────
   async register(data) {
-    await this._delay(600);
+    try {
+      // Map form data to API schema
+      const payload = {
+        full_name: data.name,
+        mobile_number: data.mobile,
+        email: data.email || null,
+        password: data.password,
+        role: data.role || 'citizen',
+        state: data.state || '',
+      };
 
-    // Basic validation
-    if (!data.name || data.name.trim().length < 2) return { success: false, error: 'Please enter a valid name.' };
-    if (!data.mobile || !/^[6-9]\d{9}$/.test(data.mobile)) return { success: false, error: 'Please enter a valid 10-digit Indian mobile number.' };
-    if (!data.password || data.password.length < 6) return { success: false, error: 'Password must be at least 6 characters.' };
+      const response = await fetch(`${this.API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const session = {
-      id: 'U' + Date.now(),
-      name: data.name.trim(),
-      mobile: data.mobile,
-      email: data.email || '',
-      role: data.role || 'citizen',
-      state: data.state || '',
-      loginAt: Date.now(),
-    };
+      const result = await response.json();
 
-    this.currentUser = session;
-    Utils.store(MS_CONFIG.STORAGE.USER, session);
-    return { success: true, user: session };
+      if (!result.success) {
+        return { success: false, error: result.error || 'Registration failed. Please try again.' };
+      }
+
+      // Store user session
+      this.currentUser = result.user;
+      Utils.store(MS_CONFIG.STORAGE.USER, result.user);
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.error('Register error:', error);
+      return { success: false, error: 'Network error. Please check your connection and try again.' };
+    }
   },
 
   // ── Logout ────────────────────────────────────────────────
@@ -108,8 +116,6 @@ const AuthService = {
     if (!this.currentUser?.name) return 'U';
     return this.currentUser.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
   },
-
-  _delay(ms) { return new Promise(r => setTimeout(r, ms)); },
 };
 
 window.AuthService = AuthService;
