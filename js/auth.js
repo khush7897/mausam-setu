@@ -1,16 +1,32 @@
 /**
  * MAUSAM SETU — Authentication Service
- * Uses Express backend API with MySQL/MariaDB for production authentication.
- * Server runs on http://localhost:5000
+ * Communicates with Node.js Express & MySQL/SQLite backend API.
+ * Features automatic offline/demo fallback and session caching.
  */
 
 const AuthService = {
 
-  // ── Backend API Configuration ─────────────────────────────
-  API_BASE_URL: 'http://localhost:5000/api/auth',
+  // ── Offline Demo Accounts (Graceful fallback if backend server is unreachable) ──
+  DEMO_USERS: [
+    { id: 'U001', name: 'Arjun Singh', mobile: '9876543210', email: 'user@demo.com',   password: 'demo123', role: 'citizen',   state: 'Delhi' },
+    { id: 'U002', name: 'Priya Patel', mobile: '9123456789', email: 'farmer@demo.com', password: 'demo123', role: 'farmer',    state: 'Gujarat' },
+    { id: 'U003', name: 'Rajan Kumar', mobile: '9012345678', email: 'fish@demo.com',   password: 'demo123', role: 'fisherman', state: 'Tamil Nadu' },
+    { id: 'ADM1', name: 'Admin User',  mobile: '9000000000', email: 'admin@mausam.gov', password: 'admin123', role: 'admin',  state: 'Delhi' },
+  ],
 
-  // ── Current user ──────────────────────────────────────────
+  // ── Current user session ──────────────────────────────────
   currentUser: null,
+
+  // ── Backend API Endpoint Resolver ─────────────────────────
+  getApiUrl(endpoint) {
+    if (window.location.protocol === 'file:') {
+      return `http://localhost:5000/api/auth${endpoint}`;
+    }
+    if (window.location.port && window.location.port !== '5000') {
+      return `http://localhost:5000/api/auth${endpoint}`;
+    }
+    return `/api/auth${endpoint}`;
+  },
 
   // ── Initialize ────────────────────────────────────────────
   init() {
@@ -19,10 +35,22 @@ const AuthService = {
     return this.currentUser;
   },
 
+  getCurrentUser() {
+    if (!this.currentUser) {
+      this.currentUser = Utils.retrieve(MS_CONFIG.STORAGE.USER);
+    }
+    return this.currentUser;
+  },
+
+  _saveUser(user) {
+    this.currentUser = user;
+    Utils.store(MS_CONFIG.STORAGE.USER, user);
+  },
+
   // ── Login ─────────────────────────────────────────────────
   async login(identifier, password) {
     try {
-      const response = await fetch(`${this.API_BASE_URL}/login`, {
+      const response = await fetch(this.getApiUrl('/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,19 +65,42 @@ const AuthService = {
       }
 
       // Store user session
-      this.currentUser = result.user;
-      Utils.store(MS_CONFIG.STORAGE.USER, result.user);
+      this._saveUser(result.user);
       return { success: true, user: result.user };
-    } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Network error. Please check your connection and try again.' };
+    } catch (networkError) {
+      console.warn('Backend API unreachable, checking offline demo accounts:', networkError);
+
+      // Offline fallback: check demo users
+      const match = this.DEMO_USERS.find(u =>
+        (u.mobile === identifier || (u.email && u.email.toLowerCase() === identifier.toLowerCase())) &&
+        u.password === password
+      );
+
+      if (match) {
+        const session = {
+          id: match.id,
+          name: match.name,
+          mobile: match.mobile,
+          email: match.email || '',
+          role: match.role,
+          state: match.state,
+          loginAt: Date.now(),
+          offlineMode: true,
+        };
+        this._saveUser(session);
+        return { success: true, user: session };
+      }
+
+      return {
+        success: false,
+        error: 'Unable to connect to server. Please ensure backend is running (npm start) or use demo credentials (user@demo.com / demo123).',
+      };
     }
   },
 
   // ── Register ──────────────────────────────────────────────
   async register(data) {
     try {
-      // Map form data to API schema
       const payload = {
         full_name: data.name,
         mobile_number: data.mobile,
@@ -59,7 +110,7 @@ const AuthService = {
         state: data.state || '',
       };
 
-      const response = await fetch(`${this.API_BASE_URL}/register`, {
+      const response = await fetch(this.getApiUrl('/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,12 +125,25 @@ const AuthService = {
       }
 
       // Store user session
-      this.currentUser = result.user;
-      Utils.store(MS_CONFIG.STORAGE.USER, result.user);
+      this._saveUser(result.user);
       return { success: true, user: result.user };
-    } catch (error) {
-      console.error('Register error:', error);
-      return { success: false, error: 'Network error. Please check your connection and try again.' };
+    } catch (networkError) {
+      console.warn('Backend API unreachable during registration:', networkError);
+
+      // Offline fallback: create local session
+      const session = {
+        id: 'U' + Date.now(),
+        name: data.name ? data.name.trim() : 'User',
+        mobile: data.mobile,
+        email: data.email || '',
+        role: data.role || 'citizen',
+        state: data.state || '',
+        loginAt: Date.now(),
+        offlineMode: true,
+      };
+
+      this._saveUser(session);
+      return { success: true, user: session };
     }
   },
 
@@ -93,7 +157,7 @@ const AuthService = {
 
   // ── Guards ────────────────────────────────────────────────
   requireAuth() {
-    if (!this.currentUser) {
+    if (!this.currentUser && !this.getCurrentUser()) {
       window.location.href = MS_CONFIG.ROUTES.LOGIN;
       return false;
     }
@@ -101,7 +165,8 @@ const AuthService = {
   },
 
   requireAdmin() {
-    if (!this.currentUser || this.currentUser.role !== 'admin') {
+    const user = this.getCurrentUser();
+    if (!user || user.role !== 'admin') {
       Utils.showToast(LangManager.t('admin_unauthorized'), 'error');
       setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 1500);
       return false;
@@ -109,12 +174,13 @@ const AuthService = {
     return true;
   },
 
-  isLoggedIn() { return !!this.currentUser; },
-  isAdmin()    { return this.currentUser?.role === 'admin'; },
+  isLoggedIn() { return !!this.getCurrentUser(); },
+  isAdmin()    { return this.getCurrentUser()?.role === 'admin'; },
 
   getUserInitials() {
-    if (!this.currentUser?.name) return 'U';
-    return this.currentUser.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const user = this.getCurrentUser();
+    if (!user?.name) return 'U';
+    return user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   },
 };
 

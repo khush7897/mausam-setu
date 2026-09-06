@@ -65,7 +65,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const validRoles = ['citizen', 'farmer', 'fisherman', 'student', 'official'];
+    const validRoles = ['citizen', 'farmer', 'fisherman', 'student', 'official', 'admin'];
     if (!role || !validRoles.includes(role)) {
       return res.status(400).json({
         success: false,

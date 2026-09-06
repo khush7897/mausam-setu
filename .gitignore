@@ -21,6 +21,14 @@ npm-debug.log*
 .env.local
 *.key
 
+# Local database files
+*.db*
+*.sqlite*
+*.sqlite3*
+mausam_setu.sqlite*
+
+
 # Build artifacts
 dist/
 build/
+

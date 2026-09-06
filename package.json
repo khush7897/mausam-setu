@@ -1,0 +1,21 @@
+{
+  "name": "mausam-setu",
+  "version": "1.0.0",
+  "description": "Mausam Setu — AI-Powered Weather & Disaster Early-Warning Platform",
+  "main": "backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "setup": "node backend/setup-db.js",
+    "install:backend": "npm --prefix backend install"
+  },
+  "keywords": [
+    "weather",
+    "disaster-management",
+    "early-warning",
+    "india"
+  ],
+  "author": "Mausam Setu Team",
+  "license": "MIT"
+}

@@ -93,13 +93,14 @@ mausam-setu/
 ## 🛠️ Technology Stack
 
 - **Frontend:** Vanilla HTML5, CSS3, JavaScript (ES6+)
+- **Backend API:** Node.js Express REST API (`/api/auth`, `/api/health`)
+- **Database:** Dual-Engine architecture (Automatic SQLite zero-config fallback + MySQL/MariaDB)
+- **Security:** bcryptjs password hashing & parameter sanitization
 - **Maps:** Leaflet.js v1.9.4 (OpenStreetMap)
 - **Charts:** Chart.js v4.4.0
 - **i18n:** Custom LangManager (EN + Hindi)
-- **Auth:** localStorage-based (demo) | Production-ready adapter pattern
 - **Weather API:** Demo mode + OpenWeatherMap/IMD adapter ready
 - **Alerts:** Demo database + NDMA API integration architecture
-- **Deployment:** GitHub Pages
 
 ---
 
@@ -134,14 +135,20 @@ mausam-setu/
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/mausam-setu.git
+git clone https://github.com/khush7897/mausam-setu.git
 cd mausam-setu
 
-# Start local server (Python)
-python -m http.server 8080
+# Install backend dependencies
+cd backend
+npm install
+cd ..
 
-# Open in browser
-# http://localhost:8080
+# Start Full Stack Server (Frontend + Backend on port 5000)
+npm start
+# or: node backend/server.js
+
+# Open in browser:
+# http://localhost:5000
 ```
 
 ---
