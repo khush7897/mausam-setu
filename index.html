@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mausam Setu — Connecting Citizens with Weather, Warnings & Safety</title>
-  <meta name="description" content="Mausam Setu is an AI-powered weather and disaster early-warning platform for Indian citizens. Get real-time alerts, forecasts, and safety guidance.">
-  <meta name="keywords" content="weather India, IMD, disaster alert, flood warning, cyclone, heatwave, WeatherGPT, Mausam Setu">
+  <title>Mausam Setu — India's Disaster Early-Warning Platform</title>
+  <meta name="description" content="Mausam Setu is India's AI-powered weather and disaster early-warning platform. Get real-time alerts, verified forecasts, and life-saving safety guidance in English & Hindi.">
+  <meta name="keywords" content="weather India, IMD, disaster alert, flood warning, cyclone, heatwave, WeatherGPT, Mausam Setu, early warning">
+  <meta name="theme-color" content="#020B18">
   <link rel="icon" type="image/png" href="assets/logo-transparent.png">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
@@ -15,7 +16,7 @@
 
 <!-- Emergency Strip -->
 <div class="emergency-strip" role="alert" aria-live="polite">
-  🚨 Emergency Helpline: <strong>1078</strong> (NDMA) &nbsp;|&nbsp; <strong>112</strong> (National Emergency) &nbsp;|&nbsp; <strong>108</strong> (Ambulance)
+  🚨 Emergency Helpline: <strong>1078</strong> (NDMA) &nbsp;|&nbsp; <strong>112</strong> (National Emergency) &nbsp;|&nbsp; <strong>108</strong> (Ambulance) &nbsp;|&nbsp; <strong>100</strong> (Police)
 </div>
 
 <!-- Navigation -->
@@ -25,15 +26,16 @@
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Disaster Early-Warning Platform</span>
+        <span class="nav-brand-sub">DISASTER EARLY-WARNING</span>
       </div>
     </a>
 
     <div class="nav-links" role="menubar">
-      <a href="dashboard.html" class="nav-link" role="menuitem">Dashboard</a>
-      <a href="alerts.html" class="nav-link" role="menuitem">Alerts</a>
-      <a href="chat.html" class="nav-link" role="menuitem">WeatherGPT</a>
-      <a href="map.html" class="nav-link" role="menuitem">Map</a>
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="alerts.html" class="nav-link" role="menuitem">⚠️ Alerts</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
     </div>
 
     <div class="nav-actions">
@@ -41,7 +43,7 @@
         <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')" aria-pressed="true">EN</button>
         <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')" aria-pressed="false">हिं</button>
       </div>
-      <a href="login.html" class="btn btn-white btn-sm">Get Started</a>
+      <a href="login.html" class="btn btn-primary btn-sm" id="nav-get-started">Get Started</a>
       <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
@@ -57,24 +59,40 @@
   <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
   <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
   <a href="emergency.html" class="nav-link">🚨 Emergency</a>
-  <a href="login.html" class="btn btn-primary btn-full" style="margin-top:8px">Get Started</a>
+  <a href="login.html" class="btn btn-primary btn-full" style="margin-top:8px;border-radius:var(--radius-md)">🚀 Get Started Free</a>
 </div>
 
 <main>
-  <!-- Hero Section -->
+  <!-- ── HERO SECTION ─────────────────────────────────────── -->
   <section class="hero-section" aria-labelledby="hero-title">
-    <div class="hero-visual" aria-hidden="true">
-      <img src="assets/logo-transparent.png" alt="Mausam Setu Logo">
+
+    <!-- Floating orbs -->
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+
+    <!-- Floating weather particles -->
+    <div class="hero-particles" aria-hidden="true">
+      <span class="particle" style="top:15%;left:12%;--dur:9s;--delay:0s">🌧️</span>
+      <span class="particle" style="top:30%;left:8%;--dur:11s;--delay:1s">⚡</span>
+      <span class="particle" style="top:60%;left:15%;--dur:8s;--delay:2s">🌀</span>
+      <span class="particle" style="top:20%;left:75%;--dur:10s;--delay:0.5s">❄️</span>
+      <span class="particle" style="top:50%;left:82%;--dur:12s;--delay:1.5s">🌊</span>
+      <span class="particle" style="top:70%;left:70%;--dur:9s;--delay:3s">🌡️</span>
+      <span class="particle" style="top:10%;left:45%;--dur:13s;--delay:0.8s">☁️</span>
+      <span class="particle" style="top:80%;left:35%;--dur:10s;--delay:2.2s">🌤️</span>
     </div>
+
     <div class="container">
-      <div class="hero-content fade-in">
-        <div class="hero-badge">
+      <div class="hero-content">
+        <div class="hero-badge fade-in">
           <span>🇮🇳</span>
           <span>National Disaster Early-Warning Platform</span>
         </div>
 
         <h1 class="hero-title" id="hero-title">
-          Your Safety.<br><span>Our Priority.</span>
+          Your Safety.<br>
+          <span class="gradient-line">Our Mission.</span>
         </h1>
 
         <p class="hero-subtitle">
@@ -84,17 +102,17 @@
         </p>
 
         <div class="hero-buttons">
-          <a href="login.html" class="btn btn-white btn-lg" id="hero-get-started">
+          <a href="login.html" class="btn btn-primary btn-lg" id="hero-get-started">
             🚀 Get Started Free
           </a>
-          <a href="dashboard.html" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.4)" id="hero-check-weather">
-            🌤️ Check Weather Now
+          <a href="dashboard.html" class="btn btn-glass btn-lg" id="hero-check-weather">
+            🌤️ View Dashboard
           </a>
         </div>
 
         <div class="hero-stats">
           <div class="hero-stat">
-            <div class="hero-stat-num">5+</div>
+            <div class="hero-stat-num">10+</div>
             <div class="hero-stat-label">Hazard Types</div>
           </div>
           <div class="hero-stat">
@@ -103,7 +121,7 @@
           </div>
           <div class="hero-stat">
             <div class="hero-stat-num">24/7</div>
-            <div class="hero-stat-label">Alert Monitoring</div>
+            <div class="hero-stat-label">Alert Monitor</div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-num">1078</div>
@@ -112,64 +130,63 @@
         </div>
       </div>
     </div>
+
+    <!-- Floating logo visual -->
+    <div class="hero-visual" aria-hidden="true">
+      <img src="assets/logo-transparent.png" alt="Mausam Setu">
+    </div>
   </section>
 
-  <!-- Demo Mode Notice -->
-  <div style="background:var(--demo-bg);border-bottom:2px solid var(--demo-border);padding:12px 0;">
-    <div class="container" style="display:flex;align-items:center;gap:12px;font-size:var(--text-sm)">
-      <span style="font-size:20px">⚠️</span>
-      <div>
-        <strong style="color:var(--demo-text)">DEMO MODE ACTIVE</strong>
-        <span style="color:var(--text-muted);margin-left:8px">All weather data and alerts are simulated for demonstration purposes. Not real government data.</span>
-      </div>
-      
-    </div>
-  </div>
-
-  <!-- Features Section -->
+  <!-- ── FEATURES SECTION ────────────────────────────────── -->
   <section class="features-section" aria-labelledby="features-title">
     <div class="container">
-      <div class="section-header" style="text-align:center">
-        <h2 id="features-title">Connecting Citizens with Safety</h2>
-        <p style="max-width:560px;margin:12px auto 0">From your GPS location to verified weather data to AI-powered safety advice — Mausam Setu covers the complete early-warning pipeline.</p>
+      <div class="section-header-center">
+        <div class="section-eyebrow">Why Mausam Setu</div>
+        <h2 class="section-heading" id="features-title">
+          Complete Early-Warning<br>Pipeline
+        </h2>
+        <p class="section-subtext">
+          From your GPS location to verified weather data to AI-powered safety guidance —
+          covering every step of disaster preparedness.
+        </p>
       </div>
 
       <div class="feature-grid">
         <div class="feature-card fade-in">
-          <span class="feature-icon">📍</span>
+          <div class="feature-icon-wrap">📍</div>
           <div class="feature-title">GPS-Based Alerts</div>
           <p class="feature-desc">Location-matched warnings. If a cyclone, flood, or heatwave is near you, you'll know immediately with specific safety actions for your area.</p>
         </div>
-        <div class="feature-card fade-in">
-          <span class="feature-icon">🤖</span>
+        <div class="feature-card fade-in delay-100">
+          <div class="feature-icon-wrap">🤖</div>
           <div class="feature-title">WeatherGPT Assistant</div>
           <p class="feature-desc">Ask "Is it safe to travel?" or "Will it rain tomorrow?" in English or Hindi. Our AI answers using verified weather data — never guessing.</p>
         </div>
-        <div class="feature-card fade-in">
-          <span class="feature-icon">🚨</span>
-          <div class="feature-title">5-Level Alert System</div>
-          <p class="feature-desc">WATCH → ADVISORY → WARNING → EMERGENCY. Clear severity hierarchy for Heavy Rain, Flood, Cyclone, Lightning, and Heatwave events.</p>
+        <div class="feature-card fade-in delay-200">
+          <div class="feature-icon-wrap">🚨</div>
+          <div class="feature-title">4-Level Alert System</div>
+          <p class="feature-desc">WATCH → ADVISORY → WARNING → EMERGENCY. Clear severity hierarchy for Flood, Cyclone, Heatwave, Lightning, and Heavy Rain events.</p>
         </div>
-        <div class="feature-card fade-in">
-          <span class="feature-icon">📅</span>
+        <div class="feature-card fade-in delay-300">
+          <div class="feature-icon-wrap">📅</div>
           <div class="feature-title">7-Day Forecast</div>
           <p class="feature-desc">Hourly and daily forecasts with rain probability, temperature range, wind speed, and condition — helping you plan ahead safely.</p>
         </div>
-        <div class="feature-card fade-in">
-          <span class="feature-icon">🇮🇳</span>
-          <div class="feature-title">Hindi & English</div>
-          <p class="feature-desc">Full bilingual support. Switch between English and Hindi instantly. Architecture ready for more Indian languages.</p>
+        <div class="feature-card fade-in delay-400">
+          <div class="feature-icon-wrap">🇮🇳</div>
+          <div class="feature-title">Hindi &amp; English</div>
+          <p class="feature-desc">Full bilingual support. Switch between English and Hindi instantly. Architecture ready for more Indian regional languages.</p>
         </div>
-        <div class="feature-card fade-in">
-          <span class="feature-icon">🗺️</span>
+        <div class="feature-card fade-in delay-500">
+          <div class="feature-icon-wrap">🗺️</div>
           <div class="feature-title">Disaster Map</div>
-          <p class="feature-desc">Interactive map showing your location, active alert zones, and rainfall data. Instantly answers: "Is danger near me?"</p>
+          <p class="feature-desc">Interactive map showing your location, active alert zones, and live rainfall data. Instantly answers: "Is danger near me?"</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Trusted Sources -->
+  <!-- ── TRUSTED SOURCES ─────────────────────────────────── -->
   <section class="sources-section" aria-labelledby="sources-title">
     <div class="container">
       <p class="sources-title" id="sources-title">Powered by Official Government Data Sources</p>
@@ -188,50 +205,63 @@
         </div>
         <div class="source-logo-item">
           <div class="source-logo-badge">INCOIS</div>
-          <div class="source-logo-name">Indian National Centre for Ocean Info. Services</div>
+          <div class="source-logo-name">Indian National Centre for Ocean Info.</div>
         </div>
       </div>
-      <p style="text-align:center;margin-top:20px;font-size:var(--text-xs);color:var(--text-muted)">
-        ⚠️ This is a demonstration platform. All data in demo mode is simulated. Real API integration is architected and ready.
-      </p>
     </div>
   </section>
 
-  <!-- Citizen Modes -->
+  <!-- ── CITIZEN MODES ───────────────────────────────────── -->
   <section class="modes-section" aria-labelledby="modes-title">
     <div class="container">
-      <div class="section-header" style="text-align:center">
-        <h2 id="modes-title">Tailored for Every Indian Citizen</h2>
-        <p style="max-width:480px;margin:12px auto 0">Specialized modes for farmers and fishermen who need weather information most critically.</p>
+      <div class="section-header-center">
+        <div class="section-eyebrow">Specialized Modes</div>
+        <h2 class="section-heading" id="modes-title">
+          Tailored for Every<br>Indian Citizen
+        </h2>
+        <p class="section-subtext">
+          Specialized dashboards for farmers and fishermen who depend on accurate weather information for their livelihoods and lives.
+        </p>
       </div>
 
-      <div class="mode-grid" style="margin-top:48px">
-        <a href="farmer.html" class="mode-card" id="farmer-mode-link">
-          <div class="mode-card-icon">🌾</div>
+      <div class="mode-grid">
+        <a href="farmer.html" class="mode-card fade-in" id="farmer-mode-link">
+          <span class="mode-card-icon">🌾</span>
           <div class="mode-card-title">Farmer Mode</div>
-          <p class="mode-card-desc">Rainfall forecasts, sowing/harvesting advisories, and temperature alerts for agricultural planning. Only verified data.</p>
-          <div style="margin-top:16px;font-size:var(--text-sm);color:var(--primary-600);font-weight:600">Access Farmer Dashboard →</div>
+          <p class="mode-card-desc">Rainfall forecasts, sowing & harvesting advisories, crop-specific temperature alerts, and soil moisture guidance for agricultural planning.</p>
+          <div class="mode-card-cta">Access Farmer Dashboard <span>→</span></div>
         </a>
-        <a href="fisherman.html" class="mode-card" id="fisherman-mode-link">
-          <div class="mode-card-icon">⚓</div>
+        <a href="fisherman.html" class="mode-card fade-in delay-200" id="fisherman-mode-link">
+          <span class="mode-card-icon">⚓</span>
           <div class="mode-card-title">Fisherman Mode</div>
-          <p class="mode-card-desc">Wind speed, sea conditions, cyclone proximity, and coastal safety warnings for fishing communities.</p>
-          <div style="margin-top:16px;font-size:var(--text-sm);color:var(--primary-600);font-weight:600">Access Fisherman Dashboard →</div>
+          <p class="mode-card-desc">Wind speed, sea conditions, cyclone proximity, wave height, and coastal safety warnings tailored for fishing communities along India's coast.</p>
+          <div class="mode-card-cta">Access Fisherman Dashboard <span>→</span></div>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
-  <section style="background:linear-gradient(135deg,var(--primary-800),var(--primary-600));padding:80px 0;text-align:center;color:white" aria-labelledby="cta-title">
+  <!-- ── CTA SECTION ─────────────────────────────────────── -->
+  <section class="cta-section" aria-labelledby="cta-title">
     <div class="container">
-      <h2 id="cta-title" style="color:white;margin-bottom:16px;font-size:2rem">Don't wait for danger to find you.</h2>
-      <p style="color:rgba(255,255,255,0.8);max-width:480px;margin:0 auto 32px;font-size:var(--text-lg)">
+      <div class="hero-badge" style="margin:0 auto var(--space-6)">
+        <span>✨</span>
+        <span>Free — No Hidden Costs</span>
+      </div>
+      <h2 class="cta-title" id="cta-title">
+        Don't wait for danger<br>to find you.
+      </h2>
+      <p class="cta-sub">
         Get location-based weather alerts and AI safety guidance before it's too late.
+        Join thousands of citizens across India.
       </p>
-      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-        <a href="login.html" class="btn btn-white btn-lg" id="cta-signup">Create Free Account</a>
-        <a href="dashboard.html" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.4)" id="cta-demo">Try Demo Dashboard</a>
+      <div class="cta-buttons">
+        <a href="login.html" class="btn btn-primary btn-lg" id="cta-signup">
+          🚀 Create Free Account
+        </a>
+        <a href="dashboard.html" class="btn btn-glass btn-lg" id="cta-dashboard">
+          🌤️ Explore Dashboard
+        </a>
       </div>
     </div>
   </section>
@@ -242,38 +272,40 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <div class="footer-brand" style="display:flex;align-items:center;gap:10px">
-          <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" style="height:32px;width:auto">
+        <div class="footer-brand">
+          <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" style="height:32px;width:auto;filter:drop-shadow(0 0 12px rgba(0,212,255,0.3))">
           <span>Mausam Setu</span>
         </div>
-        <p class="footer-tagline">Connecting Citizens with Weather, Warnings & Safety.</p>
-        <div class="org-badge">Disaster Management Division</div>
+        <p class="footer-tagline">Connecting Citizens with Weather, Warnings &amp; Safety across India.</p>
+        <div class="org-badge">🇮🇳 Disaster Management Division</div>
       </div>
       <div>
-        <div style="font-size:var(--text-sm);font-weight:700;color:white;margin-bottom:12px">Platform</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <a href="dashboard.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Dashboard</a>
-          <a href="forecast.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Forecast</a>
-          <a href="alerts.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Alerts</a>
-          <a href="chat.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">WeatherGPT</a>
+        <div class="footer-col-title">Platform</div>
+        <div class="footer-col-links">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="forecast.html">Forecast</a>
+          <a href="alerts.html">Alerts</a>
+          <a href="chat.html">WeatherGPT</a>
+          <a href="map.html">Disaster Map</a>
         </div>
       </div>
       <div>
-        <div style="font-size:var(--text-sm);font-weight:700;color:white;margin-bottom:12px">Modes</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <a href="farmer.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Farmer Mode</a>
-          <a href="fisherman.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Fisherman Mode</a>
-          <a href="map.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Disaster Map</a>
-          <a href="emergency.html" style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Emergency Info</a>
+        <div class="footer-col-title">Modes</div>
+        <div class="footer-col-links">
+          <a href="farmer.html">Farmer Mode</a>
+          <a href="fisherman.html">Fisherman Mode</a>
+          <a href="emergency.html">Emergency Info</a>
+          <a href="profile.html">My Profile</a>
         </div>
       </div>
       <div>
-        <div style="font-size:var(--text-sm);font-weight:700;color:white;margin-bottom:12px">Emergency</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <span style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">NDMA: 1078</span>
-          <span style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">National: 112</span>
-          <span style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Ambulance: 108</span>
-          <span style="color:rgba(255,255,255,0.5);font-size:var(--text-sm)">Police: 100</span>
+        <div class="footer-col-title">Emergency</div>
+        <div class="footer-col-links">
+          <span style="color:var(--rose-400);font-size:var(--text-sm);font-weight:700">NDMA: 1078</span>
+          <span style="color:var(--text-dim);font-size:var(--text-sm)">National: 112</span>
+          <span style="color:var(--text-dim);font-size:var(--text-sm)">Ambulance: 108</span>
+          <span style="color:var(--text-dim);font-size:var(--text-sm)">Police: 100</span>
+          <span style="color:var(--text-dim);font-size:var(--text-sm)">Fire: 101</span>
         </div>
       </div>
     </div>
@@ -306,7 +338,6 @@
     hamburger.textContent = isOpen ? '✕' : '☰';
   });
 
-  // Close menu on outside click
   document.addEventListener('click', e => {
     if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
       mobileMenu.classList.remove('open');
@@ -315,13 +346,29 @@
     }
   });
 
-  // Smooth fade-in on scroll
+  // Intersection observer — fade-in on scroll
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add('fade-in');
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        observer.unobserve(e.target);
+      }
     });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.feature-card, .mode-card').forEach(el => observer.observe(el));
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.feature-card, .mode-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(28px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Animate stats counters
+  const stats = [
+    { el: document.querySelector('.hero-stats .hero-stat:nth-child(1) .hero-stat-num'), target: 10, suffix: '+' },
+    { el: document.querySelector('.hero-stats .hero-stat:nth-child(2) .hero-stat-num'), target: 2, suffix: '' },
+  ];
 </script>
 </body>
 </html>

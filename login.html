@@ -3,175 +3,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Mausam Setu</title>
-  <meta name="description" content="Login or register to access Mausam Setu weather alerts and AI weather assistant.">
+  <title>Login / Register — Mausam Setu</title>
+  <meta name="description" content="Login or create your Mausam Setu account to access personalized weather alerts, AI safety guidance, and disaster early-warnings for your location.">
+  <meta name="theme-color" content="#020B18">
   <link rel="icon" type="image/png" href="assets/logo-transparent.png">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pages.css">
+  <style>
+    /* Extra auth-specific polish */
+    .pw-wrapper {
+      position: relative;
+    }
+    .pw-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-dim);
+      transition: color var(--transition-fast);
+      padding: 4px;
+    }
+    .pw-toggle:hover { color: var(--text-secondary); }
+    .pw-wrapper .form-input { padding-right: 44px; }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--cyan-400);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-2);
+    }
+
+    /* Mobile-only logo shown on small screens */
+    .auth-mobile-logo {
+      display: none;
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+    .auth-mobile-logo img {
+      height: 52px;
+      filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.4));
+    }
+    .auth-mobile-logo-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: var(--space-2);
+    }
+
+    @media (max-width: 768px) {
+      .auth-mobile-logo { display: block; }
+    }
+
+    /* Animated aurora lines behind form */
+    .auth-glow-line {
+      position: absolute;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--cyan-500), transparent);
+      pointer-events: none;
+      opacity: 0.15;
+      animation: floatSlow 8s ease-in-out infinite;
+    }
+
+    /* Form row double column */
+    .reg-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    @media (max-width: 480px) {
+      .reg-row-2 { grid-template-columns: 1fr; gap: var(--space-3); }
+    }
+  </style>
 </head>
 <body>
+
+<!-- Emergency Strip (minimal on auth) -->
+<div class="emergency-strip" role="alert" style="font-size:11px;padding:5px 12px">
+  🚨 Emergency: <strong>1078</strong> (NDMA) &nbsp;|&nbsp; <strong>112</strong> (National) &nbsp;|&nbsp; <strong>108</strong> (Ambulance)
+</div>
+
 <div class="auth-page">
-  <!-- Left Panel -->
+
+  <!-- ── LEFT PANEL — Aurora Visual ──────────────────────── -->
   <div class="auth-left">
-    <div>
-      <a href="index.html" style="display:inline-flex;align-items:center;gap:12px;color:white;text-decoration:none;margin-bottom:48px">
-        <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" style="height:44px;width:auto">
-        <span style="font-size:1.25rem;font-weight:800">Mausam Setu</span>
-      </a>
-      <h1 style="color:white;font-size:2rem;margin-bottom:16px;font-weight:900">
-        Stay safe.<br>Stay informed.
+    <div class="auth-left-orb auth-left-orb-1"></div>
+    <div class="auth-left-orb auth-left-orb-2"></div>
+
+    <div class="auth-left-content">
+      <div class="auth-left-logo">
+        <img src="assets/logo-transparent.png" alt="Mausam Setu Logo">
+        <span class="auth-left-logo-text">Mausam Setu</span>
+      </div>
+
+      <h1 class="auth-left-headline">
+        Stay Safe.<br>Stay <span>Informed.</span>
       </h1>
-      <p style="color:rgba(255,255,255,0.75);font-size:var(--text-base);line-height:1.7;margin-bottom:40px">
-        Join thousands of citizens getting real-time weather alerts, AI safety guidance, and disaster warnings — tailored to your location.
+
+      <p class="auth-left-sub">
+        India's most intelligent weather &amp; disaster early-warning platform.
+        Know before the storm hits. Plan before the flood comes.
       </p>
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.8);font-size:var(--text-sm)">
-          <span style="font-size:20px">📍</span> GPS-based location alerts
+
+      <div class="auth-left-features">
+        <div class="auth-left-feature">
+          <div class="auth-left-feature-icon">📍</div>
+          <span>GPS-based alerts for your exact location</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.8);font-size:var(--text-sm)">
-          <span style="font-size:20px">🤖</span> WeatherGPT AI assistant
+        <div class="auth-left-feature">
+          <div class="auth-left-feature-icon">🤖</div>
+          <span>AI weather assistant in English &amp; Hindi</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.8);font-size:var(--text-sm)">
-          <span style="font-size:20px">🚨</span> Cyclone, flood & heatwave alerts
+        <div class="auth-left-feature">
+          <div class="auth-left-feature-icon">🚨</div>
+          <span>Real-time flood, cyclone &amp; heatwave alerts</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.8);font-size:var(--text-sm)">
-          <span style="font-size:20px">🇮🇳</span> English & Hindi support
+        <div class="auth-left-feature">
+          <div class="auth-left-feature-icon">📅</div>
+          <span>7-day verified weather forecasts</span>
         </div>
       </div>
-      <div style="margin-top:48px;background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:16px">
-        <div style="font-size:var(--text-xs);color:rgba(255,255,255,0.6);margin-bottom:8px">DEMO ACCOUNTS</div>
-        <div style="font-size:var(--text-sm);color:rgba(255,255,255,0.9);display:flex;flex-direction:column;gap:4px">
-          <span>👤 user@demo.com / demo123</span>
-          <span>🌾 farmer@demo.com / demo123</span>
-          <span>⚓ fish@demo.com / demo123</span>
-          <span>🛡️ admin@mausam.gov / admin123</span>
-        </div>
+
+      <!-- Bottom attribution -->
+      <div style="margin-top:auto;padding-top:var(--space-10)">
+        <p style="font-size:10px;color:var(--text-dim);line-height:1.6">
+          Data sourced from IMD, NDMA, MoES, and INCOIS —<br>
+          India's official meteorological and disaster management agencies.
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- Right Panel -->
+  <!-- ── RIGHT PANEL — Auth Form ──────────────────────────── -->
   <div class="auth-right">
     <div class="auth-card">
-      <!-- Tab Switch -->
+
+      <!-- Mobile-only header -->
+      <div class="auth-mobile-logo">
+        <img src="assets/logo-transparent.png" alt="Mausam Setu Logo">
+        <div class="auth-mobile-logo-title">Mausam Setu</div>
+      </div>
+
       <div class="auth-header">
-        <div class="auth-logo"><img src="assets/logo-transparent.png" alt="Mausam Setu Logo"></div>
+        <div class="brand-pill">🇮🇳 Disaster Early-Warning Platform</div>
         <h1 class="auth-title" id="auth-main-title">Welcome Back</h1>
-        <p class="auth-subtitle" id="auth-main-subtitle">Login to access your weather dashboard</p>
+        <p class="auth-subtitle" id="auth-main-subtitle">Sign in to your weather dashboard</p>
       </div>
 
-      <div class="tabs" style="margin-bottom:28px">
-        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Login</button>
-        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>
-      </div>
+      <div class="auth-form-card">
+        <!-- Tab Switcher -->
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab-btn active" id="tab-login" role="tab" aria-selected="true"
+            onclick="switchTab('login')">Login</button>
+          <button class="auth-tab-btn" id="tab-register" role="tab" aria-selected="false"
+            onclick="switchTab('register')">Register</button>
+        </div>
 
-      <!-- Login Form -->
-      <div id="panel-login" class="tab-panel active">
-        <form id="login-form" novalidate>
-          <div class="form-group">
-            <label class="form-label" for="login-id">
-              Mobile Number / Email <span class="required">*</span>
-            </label>
-            <input type="text" id="login-id" class="form-input"
-              placeholder="9876543210 or user@demo.com"
-              autocomplete="username" required aria-required="true">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="login-pass">
-              Password <span class="required">*</span>
-            </label>
-            <div style="position:relative">
-              <input type="password" id="login-pass" class="form-input"
-                placeholder="Enter your password"
-                autocomplete="current-password" required aria-required="true">
-              <button type="button" onclick="togglePassword('login-pass', this)"
-                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted)"
-                aria-label="Toggle password visibility">👁️</button>
-            </div>
-          </div>
-
-          <div id="login-error" class="form-error hidden" role="alert" aria-live="assertive">
-            <span>⚠️</span> <span id="login-error-msg"></span>
-          </div>
-
-          <div style="text-align:right;margin-bottom:20px">
-            <a href="#" style="font-size:var(--text-sm);color:var(--primary-600)">Forgot Password?</a>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">
-            <span id="login-btn-text">Login to Mausam Setu</span>
-            <div class="spinner hidden" id="login-spinner"></div>
-          </button>
-
-          <div class="form-divider">or</div>
-
-          <div style="background:var(--info-bg);border:1px solid var(--primary-200);border-radius:var(--radius);padding:12px;font-size:var(--text-xs);color:var(--primary-700)">
-            <strong>Quick Demo:</strong> user@demo.com / demo123
-          </div>
-        </form>
-      </div>
-
-      <!-- Register Form -->
-      <div id="panel-register" class="tab-panel">
-        <form id="register-form" novalidate>
-          <div class="form-group">
-            <label class="form-label" for="reg-name">Full Name <span class="required">*</span></label>
-            <input type="text" id="reg-name" class="form-input" placeholder="Your full name" autocomplete="name" required>
-          </div>
-          <div class="form-row-2">
+        <!-- ── Login Form ─────────────────────────── -->
+        <div id="panel-login" class="tab-panel active" role="tabpanel">
+          <form id="login-form" novalidate>
             <div class="form-group">
-              <label class="form-label" for="reg-mobile">Mobile <span class="required">*</span></label>
-              <input type="tel" id="reg-mobile" class="form-input" placeholder="10-digit mobile" autocomplete="tel" required>
+              <label class="form-label" for="login-id">
+                Email or Mobile <span class="required">*</span>
+              </label>
+              <input type="text" id="login-id" class="form-input"
+                placeholder="email@example.com or 10-digit mobile"
+                autocomplete="username" required>
             </div>
+
             <div class="form-group">
-              <label class="form-label" for="reg-email">Email</label>
-              <input type="email" id="reg-email" class="form-input" placeholder="Optional" autocomplete="email">
+              <label class="form-label" for="login-pass">
+                Password <span class="required">*</span>
+              </label>
+              <div class="pw-wrapper">
+                <input type="password" id="login-pass" class="form-input"
+                  placeholder="Enter your password"
+                  autocomplete="current-password" required>
+                <button type="button" class="pw-toggle" onclick="togglePassword('login-pass', this)"
+                  aria-label="Show/hide password">👁️</button>
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-role">I am a <span class="required">*</span></label>
-            <select id="reg-role" class="form-input form-select">
-              <option value="citizen">General Citizen</option>
-              <option value="farmer">Farmer</option>
-              <option value="fisherman">Fisherman</option>
-              <option value="student">Student</option>
-              <option value="official">Disaster Management Official</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-state">State <span class="required">*</span></label>
-            <select id="reg-state" class="form-input form-select">
-              <option value="">Select your state...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-pass">Password <span class="required">*</span></label>
-            <input type="password" id="reg-pass" class="form-input" placeholder="Minimum 6 characters" autocomplete="new-password" required>
-            <span class="form-hint">At least 6 characters</span>
-          </div>
 
-          <div id="reg-error" class="form-error hidden" role="alert" aria-live="assertive">
-            <span>⚠️</span> <span id="reg-error-msg"></span>
-          </div>
+            <div id="login-error" class="form-error hidden" role="alert" aria-live="assertive">
+              <span>⚠️</span> <span id="login-error-msg"></span>
+            </div>
 
-          <button type="submit" class="btn btn-primary btn-full btn-lg" id="reg-btn" style="margin-top:8px">
-            <span id="reg-btn-text">Create Account</span>
-            <div class="spinner hidden" id="reg-spinner"></div>
-          </button>
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn"
+              style="margin-top:var(--space-2)">
+              <span id="login-btn-text">Login to Mausam Setu</span>
+              <div class="spinner hidden" id="login-spinner"></div>
+            </button>
+          </form>
+        </div>
 
-          <p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:12px;text-align:center">
-            By registering you agree to use Mausam Setu responsibly for personal safety purposes only.
-          </p>
-        </form>
+        <!-- ── Register Form ──────────────────────── -->
+        <div id="panel-register" class="tab-panel" role="tabpanel">
+          <form id="register-form" novalidate>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-name">
+                Full Name <span class="required">*</span>
+              </label>
+              <input type="text" id="reg-name" class="form-input"
+                placeholder="Your full name"
+                autocomplete="name" required>
+            </div>
+
+            <div class="reg-row-2">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="reg-mobile">
+                  Mobile <span class="required">*</span>
+                </label>
+                <input type="tel" id="reg-mobile" class="form-input"
+                  placeholder="10-digit number"
+                  autocomplete="tel" required
+                  maxlength="10" pattern="[6-9][0-9]{9}">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="reg-email">
+                  Email Address <span class="required">*</span>
+                </label>
+                <input type="email" id="reg-email" class="form-input"
+                  placeholder="you@email.com"
+                  autocomplete="email" required>
+              </div>
+            </div>
+            <div style="height:var(--space-5)"></div>
+
+            <div class="reg-row-2">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="reg-role">
+                  I am a <span class="required">*</span>
+                </label>
+                <select id="reg-role" class="form-input form-select">
+                  <option value="citizen">General Citizen</option>
+                  <option value="farmer">Farmer</option>
+                  <option value="fisherman">Fisherman</option>
+                  <option value="student">Student</option>
+                  <option value="official">Disaster Mgmt. Official</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="reg-state">
+                  State <span class="required">*</span>
+                </label>
+                <select id="reg-state" class="form-input form-select">
+                  <option value="">Select state...</option>
+                </select>
+              </div>
+            </div>
+            <div style="height:var(--space-5)"></div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-pass">
+                Password <span class="required">*</span>
+              </label>
+              <div class="pw-wrapper">
+                <input type="password" id="reg-pass" class="form-input"
+                  placeholder="Minimum 6 characters"
+                  autocomplete="new-password" required minlength="6">
+                <button type="button" class="pw-toggle" onclick="togglePassword('reg-pass', this)"
+                  aria-label="Show/hide password">👁️</button>
+              </div>
+              <span class="form-hint">At least 6 characters required</span>
+            </div>
+
+            <div id="reg-error" class="form-error hidden" role="alert" aria-live="assertive">
+              <span>⚠️</span> <span id="reg-error-msg"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="reg-btn"
+              style="margin-top:var(--space-2)">
+              <span id="reg-btn-text">Create Account</span>
+              <div class="spinner hidden" id="reg-spinner"></div>
+            </button>
+
+            <p style="font-size:var(--text-xs);color:var(--text-dim);margin-top:var(--space-4);text-align:center;line-height:1.6">
+              By registering you agree to use Mausam Setu responsibly<br>for personal safety and emergency preparedness only.
+            </p>
+          </form>
+        </div>
+
+        <!-- Lang toggle -->
+        <div style="display:flex;justify-content:center;margin-top:var(--space-6);gap:8px;align-items:center">
+          <span style="font-size:var(--text-xs);color:var(--text-dim)">Language:</span>
+          <button onclick="LangManager.setLanguage('en')"
+            style="background:none;border:none;font-size:var(--text-xs);font-weight:700;cursor:pointer;color:var(--cyan-400)">EN</button>
+          <span style="color:var(--text-dim)">|</span>
+          <button onclick="LangManager.setLanguage('hi')"
+            style="background:none;border:none;font-size:var(--text-xs);font-weight:700;cursor:pointer;color:var(--cyan-400)">हिन्दी</button>
+        </div>
       </div>
 
-      <!-- Lang toggle -->
-      <div style="display:flex;justify-content:center;margin-top:24px;gap:8px">
-        <span style="font-size:var(--text-xs);color:var(--text-muted)">Language:</span>
-        <button onclick="LangManager.setLanguage('en')" style="background:none;border:none;font-size:var(--text-xs);font-weight:700;cursor:pointer;color:var(--primary-600)">EN</button>
-        <span style="color:var(--text-muted)">|</span>
-        <button onclick="LangManager.setLanguage('hi')" style="background:none;border:none;font-size:var(--text-xs);font-weight:700;cursor:pointer;color:var(--primary-600)">हिन्दी</button>
+      <!-- Back to home -->
+      <div style="text-align:center;margin-top:var(--space-5)">
+        <a href="index.html" style="font-size:var(--text-sm);color:var(--text-dim)">
+          ← Back to Home
+        </a>
       </div>
     </div>
   </div>
@@ -199,21 +337,35 @@
     stateSelect.appendChild(opt);
   });
 
+  // ── Tab Switcher ──────────────────────────────────────
   function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.auth-tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
     document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).setAttribute('aria-selected', 'true');
     document.getElementById('panel-' + tab).classList.add('active');
-    document.getElementById('auth-main-title').textContent = tab === 'login' ? 'Welcome Back' : 'Create Account';
-    document.getElementById('auth-main-subtitle').textContent = tab === 'login' ? 'Login to access your weather dashboard' : 'Join Mausam Setu for free';
+
+    document.getElementById('auth-main-title').textContent =
+      tab === 'login' ? 'Welcome Back' : 'Create Account';
+    document.getElementById('auth-main-subtitle').textContent =
+      tab === 'login' ? 'Sign in to your weather dashboard' : 'Join Mausam Setu for free';
+
+    // clear errors on tab switch
+    hideError('login'); hideError('reg');
   }
 
+  // ── Password Toggle ───────────────────────────────────
   function togglePassword(id, btn) {
     const input = document.getElementById(id);
     if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
     else { input.type = 'password'; btn.textContent = '👁️'; }
   }
 
+  // ── Loading State ─────────────────────────────────────
   function setLoading(formType, loading) {
     const btn = document.getElementById(formType + '-btn');
     const txt = document.getElementById(formType + '-btn-text');
@@ -223,6 +375,7 @@
     spin.classList.toggle('hidden', !loading);
   }
 
+  // ── Error / Success Display ───────────────────────────
   function showError(formType, msg) {
     const err = document.getElementById(formType + '-error');
     const errMsg = document.getElementById(formType + '-error-msg');
@@ -234,13 +387,26 @@
     document.getElementById(formType + '-error').classList.add('hidden');
   }
 
-  // Login
+  // ── Email Validation ──────────────────────────────────
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // ── Mobile Validation ─────────────────────────────────
+  function isValidMobile(mobile) {
+    return /^[6-9][0-9]{9}$/.test(mobile);
+  }
+
+  // ── Login Form Submit ─────────────────────────────────
   document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
     hideError('login');
     const id = document.getElementById('login-id').value.trim();
     const pass = document.getElementById('login-pass').value;
-    if (!id || !pass) { showError('login', 'Please fill in all fields.'); return; }
+    if (!id || !pass) {
+      showError('login', 'Please fill in all fields.');
+      return;
+    }
     setLoading('login', true);
     const result = await AuthService.login(id, pass);
     setLoading('login', false);
@@ -252,21 +418,50 @@
     }
   });
 
-  // Register
+  // ── Register Form Submit ──────────────────────────────
   document.getElementById('register-form').addEventListener('submit', async e => {
     e.preventDefault();
     hideError('reg');
-    const data = {
-      name: document.getElementById('reg-name').value.trim(),
-      mobile: document.getElementById('reg-mobile').value.trim(),
-      email: document.getElementById('reg-email').value.trim(),
-      role: document.getElementById('reg-role').value,
-      state: document.getElementById('reg-state').value,
-      password: document.getElementById('reg-pass').value,
-    };
+
+    const name   = document.getElementById('reg-name').value.trim();
+    const mobile = document.getElementById('reg-mobile').value.trim();
+    const email  = document.getElementById('reg-email').value.trim();
+    const role   = document.getElementById('reg-role').value;
+    const state  = document.getElementById('reg-state').value;
+    const pass   = document.getElementById('reg-pass').value;
+
+    // Client-side validation
+    if (!name) {
+      showError('reg', 'Full name is required.');
+      document.getElementById('reg-name').focus();
+      return;
+    }
+    if (!isValidMobile(mobile)) {
+      showError('reg', 'Enter a valid 10-digit Indian mobile number (starting with 6-9).');
+      document.getElementById('reg-mobile').focus();
+      return;
+    }
+    if (!email || !isValidEmail(email)) {
+      showError('reg', 'A valid email address is required for account creation.');
+      document.getElementById('reg-email').focus();
+      return;
+    }
+    if (!state) {
+      showError('reg', 'Please select your state.');
+      document.getElementById('reg-state').focus();
+      return;
+    }
+    if (pass.length < 6) {
+      showError('reg', 'Password must be at least 6 characters.');
+      document.getElementById('reg-pass').focus();
+      return;
+    }
+
+    const data = { name, mobile, email, role, state, password: pass };
     setLoading('reg', true);
     const result = await AuthService.register(data);
     setLoading('reg', false);
+
     if (result.success) {
       Utils.showToast('Account created! Welcome to Mausam Setu 🎉', 'success');
       setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 800);
