@@ -66,19 +66,9 @@
   <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
   <a href="emergency.html" class="nav-link">🚨 Emergency</a>
 </div>
-<div class="demo-ribbon">⚠️ DEMO MODE</div>
 
 <main class="main-content">
   <div class="container">
-
-    <!-- Demo Mode Notice -->
-    <div class="demo-mode-notice fade-in">
-      <span class="demo-mode-notice-icon">🔬</span>
-      <div class="demo-mode-notice-text">
-        <strong>DEMO MODE — Simulated Weather Data</strong>
-        All weather data and alerts shown below are simulated for demonstration purposes. Not real government data. Real IMD API integration is architecturally ready.
-      </div>
-    </div>
 
     <!-- Location Bar -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);flex-wrap:wrap;gap:12px">
@@ -91,7 +81,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:12px">
         <div class="source-strip">
-          📡 <span id="data-source-label">Data Source: DEMO DATA</span>
+          📡 <span id="data-source-label">Data Source: IMD Live Observations</span>
         </div>
         <div style="font-size:var(--text-xs);color:var(--text-muted)" id="last-updated-label">--</div>
       </div>
@@ -108,7 +98,6 @@
       <div class="question-label">🚨 IS THERE DANGER?</div>
       <div style="background:var(--success-bg);border:1px solid #A5D6A7;border-radius:var(--radius-md);padding:14px 18px;display:flex;align-items:center;gap:12px;font-weight:600;color:var(--success)">
         ✅ <span id="no-alert-text">No active weather hazards for your area</span>
-        <span class="demo-badge" style="margin-left:auto">⚠️ DEMO DATA</span>
       </div>
     </div>
 
@@ -131,7 +120,6 @@
                 <div style="font-size:var(--text-lg);font-weight:700;color:white" id="weather-condition-label">--</div>
                 <div style="font-size:var(--text-sm);color:rgba(255,255,255,0.7)" id="weather-description-label">--</div>
               </div>
-              <span class="demo-badge">⚠️ DEMO</span>
             </div>
             <div style="display:flex;align-items:flex-end;gap:20px;margin-bottom:24px">
               <div id="weather-icon-large" style="font-size:64px;line-height:1">☀️</div>
@@ -169,7 +157,6 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">⏰ <span data-t="dash_hourly">Hourly Forecast</span></div>
-            <span class="demo-badge">⚠️ DEMO</span>
           </div>
           <div class="card-body" style="padding-bottom:12px">
             <div class="forecast-scroll" id="hourly-scroll">

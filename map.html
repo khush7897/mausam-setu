@@ -35,23 +35,13 @@
     </div>
   </div>
 </nav>
-<div class="demo-ribbon">⚠️ DEMO MODE</div>
 
 <main class="main-content">
   <div class="container">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-5);flex-wrap:wrap;gap:12px">
       <div>
         <h1 style="font-size:var(--text-3xl)" data-t="map_title">🗺️ Weather & Disaster Map</h1>
-        <p style="color:var(--text-muted);margin-top:4px">Is danger near me? See alert zones on the map.</p>
-      </div>
-      <span class="demo-badge">🔬 DEMO ZONES</span>
-    </div>
-
-    <div class="demo-mode-notice" style="margin-bottom:var(--space-4)">
-      <span class="demo-mode-notice-icon">🗺️</span>
-      <div class="demo-mode-notice-text">
-        <strong>DEMO MAP — Alert zones are simulated</strong>
-        Alert zone overlays are approximate boundaries for demonstration. Not real government-verified disaster boundaries.
+        <p style="color:var(--text-muted);margin-top:4px">Real-time IMD radar, precipitation, and active alert zones across India.</p>
       </div>
     </div>
 
@@ -221,7 +211,6 @@ function renderMapAlertsList(alerts) {
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
             <span style="font-size:20px">${haz?.icon || '⚠️'}</span>
             <span class="alert-severity-badge severity-${a.severity.toLowerCase()}">${sev.label}</span>
-            <span class="demo-badge" style="margin-left:auto">SIM</span>
           </div>
           <div style="font-weight:700;font-size:var(--text-sm);margin-bottom:4px">${a.title}</div>
           <div style="font-size:var(--text-xs);color:var(--text-muted)">📍 ${a.area}</div>

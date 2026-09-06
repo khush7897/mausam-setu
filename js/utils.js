@@ -217,13 +217,13 @@ const Utils = {
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
   },
 
-  // ── Generate Demo Badge ────────────────────────────────────
+  // ── Demo Badge (Cleaned) ───────────────────────────────────
   demoBadge() {
-    return `<span class="demo-badge" title="This is simulated data for demonstration purposes. Not real government data.">⚠️ DEMO DATA</span>`;
+    return '';
   },
 
   demoSimBadge() {
-    return `<span class="demo-badge sim-badge" title="This is a simulated alert for demonstration purposes. Not a real emergency.">🔬 SIMULATION</span>`;
+    return '';
   },
 
   // ── Is Day ─────────────────────────────────────────────────

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mausam Setu — India's Disaster Early-Warning Platform</title>
-  <meta name="description" content="Mausam Setu is India's AI-powered weather and disaster early-warning platform. Get real-time alerts, verified forecasts, and life-saving safety guidance in English & Hindi.">
-  <meta name="keywords" content="weather India, IMD, disaster alert, flood warning, cyclone, heatwave, WeatherGPT, Mausam Setu, early warning">
-  <meta name="theme-color" content="#020B18">
+  <title>Mausam Setu — Your Weather Companion</title>
+  <meta name="description" content="Mausam Setu is India's AI-powered weather platform. Get accurate forecasts, real-time alerts, interactive maps, and AI weather intelligence — all in friendly conversation.">
+  <meta name="keywords" content="weather India, IMD, disaster alert, flood warning, cyclone, heatwave, WeatherGPT, Mausam Setu">
+  <meta name="theme-color" content="#2563EB">
   <link rel="icon" type="image/png" href="assets/logo-transparent.png">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
@@ -15,8 +15,8 @@
 <body>
 
 <!-- Emergency Strip -->
-<div class="emergency-strip" role="alert" aria-live="polite">
-  🚨 Emergency Helpline: <strong>1078</strong> (NDMA) &nbsp;|&nbsp; <strong>112</strong> (National Emergency) &nbsp;|&nbsp; <strong>108</strong> (Ambulance) &nbsp;|&nbsp; <strong>100</strong> (Police)
+<div class="emergency-strip" role="alert">
+  🚨 Emergency: <strong>1078</strong> (NDMA) &nbsp;|&nbsp; <strong>112</strong> (National) &nbsp;|&nbsp; <strong>108</strong> (Ambulance) &nbsp;|&nbsp; <strong>100</strong> (Police)
 </div>
 
 <!-- Navigation -->
@@ -24,116 +24,139 @@
   <div class="container">
     <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
-      <div class="nav-brand-text">
-        <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">DISASTER EARLY-WARNING</span>
-      </div>
+      <span class="nav-brand-name">Mausam<span>Setu</span></span>
     </a>
 
     <div class="nav-links" role="menubar">
-      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
-      <a href="alerts.html" class="nav-link" role="menuitem">⚠️ Alerts</a>
-      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
-      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
-      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="index.html" class="nav-link active" role="menuitem">Home</a>
+      <a href="chat.html" class="nav-link" role="menuitem">WeatherGPT</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">Forecast</a>
+      <a href="map.html" class="nav-link" role="menuitem">Maps</a>
+      <a href="alerts.html" class="nav-link" role="menuitem">Alerts</a>
     </div>
 
     <div class="nav-actions">
+      <button class="nav-search-btn" aria-label="Search">🔍</button>
       <div class="lang-toggle" role="group" aria-label="Language selection">
         <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')" aria-pressed="true">EN</button>
         <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')" aria-pressed="false">हिं</button>
       </div>
-      <a href="login.html" class="btn btn-primary btn-sm" id="nav-get-started">Get Started</a>
+      <a href="login.html" class="btn btn-primary btn-sm" id="nav-sign-in">Sign In</a>
       <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
 
 <!-- Mobile Menu -->
-<div class="nav-mobile-menu" id="mobile-menu" role="navigation" aria-label="Mobile navigation">
-  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-  <a href="forecast.html" class="nav-link">📅 Forecast</a>
-  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="index.html" class="nav-link active">Home</a>
   <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
-  <a href="map.html" class="nav-link">🗺️ Map</a>
+  <a href="forecast.html" class="nav-link">📅 Forecast</a>
+  <a href="map.html" class="nav-link">🗺️ Maps</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
   <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
   <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
-  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
-  <a href="login.html" class="btn btn-primary btn-full" style="margin-top:8px;border-radius:var(--radius-md)">🚀 Get Started Free</a>
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="login.html" class="btn btn-primary btn-full" style="margin-top:8px;border-radius:var(--radius-md)">Sign In / Register</a>
 </div>
 
 <main>
-  <!-- ── HERO SECTION ─────────────────────────────────────── -->
+  <!-- ── HERO SECTION (Screen 1 Reference) ───────────────── -->
   <section class="hero-section" aria-labelledby="hero-title">
+    <div class="hero-backdrop" aria-hidden="true"></div>
+    <div class="hero-backdrop-fade" aria-hidden="true"></div>
 
-    <!-- Floating orbs -->
-    <div class="hero-orb hero-orb-1"></div>
-    <div class="hero-orb hero-orb-2"></div>
-    <div class="hero-orb hero-orb-3"></div>
+    <div class="container" style="position:relative;z-index:2;width:100%">
+      <div class="hero-main-grid">
 
-    <!-- Floating weather particles -->
-    <div class="hero-particles" aria-hidden="true">
-      <span class="particle" style="top:15%;left:12%;--dur:9s;--delay:0s">🌧️</span>
-      <span class="particle" style="top:30%;left:8%;--dur:11s;--delay:1s">⚡</span>
-      <span class="particle" style="top:60%;left:15%;--dur:8s;--delay:2s">🌀</span>
-      <span class="particle" style="top:20%;left:75%;--dur:10s;--delay:0.5s">❄️</span>
-      <span class="particle" style="top:50%;left:82%;--dur:12s;--delay:1.5s">🌊</span>
-      <span class="particle" style="top:70%;left:70%;--dur:9s;--delay:3s">🌡️</span>
-      <span class="particle" style="top:10%;left:45%;--dur:13s;--delay:0.8s">☁️</span>
-      <span class="particle" style="top:80%;left:35%;--dur:10s;--delay:2.2s">🌤️</span>
-    </div>
-
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge fade-in">
-          <span>🇮🇳</span>
-          <span>National Disaster Early-Warning Platform</span>
-        </div>
-
-        <h1 class="hero-title" id="hero-title">
-          Your Safety.<br>
-          <span class="gradient-line">Our Mission.</span>
-        </h1>
-
-        <p class="hero-subtitle">
-          AI-powered weather intelligence for every Indian citizen.
-          Real-time alerts, verified forecasts, and life-saving safety guidance —
-          in your language, for your location.
-        </p>
-
-        <div class="hero-buttons">
-          <a href="login.html" class="btn btn-primary btn-lg" id="hero-get-started">
-            🚀 Get Started Free
-          </a>
-          <a href="dashboard.html" class="btn btn-glass btn-lg" id="hero-check-weather">
-            🌤️ View Dashboard
-          </a>
-        </div>
-
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-num">10+</div>
-            <div class="hero-stat-label">Hazard Types</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num">2</div>
-            <div class="hero-stat-label">Languages</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num">24/7</div>
-            <div class="hero-stat-label">Alert Monitor</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num">1078</div>
-            <div class="hero-stat-label">NDMA Helpline</div>
+        <!-- Left: Headline, Subtitle, CTA Buttons -->
+        <div class="hero-text-col">
+          <span class="hero-eyebrow">YOUR WEATHER COMPANION</span>
+          <h1 class="hero-title" id="hero-title">
+            Understand Today.<br>Prepare for<br>Tomorrow.
+          </h1>
+          <p class="hero-subtitle">
+            Real-time IMD weather intelligence, hyperlocal forecasts, early warnings, and AI-powered insights for India.
+          </p>
+          <div class="hero-buttons">
+            <a href="chat.html" class="btn btn-primary btn-lg" id="hero-start-chat">
+              Start Chatting →
+            </a>
+            <a href="forecast.html" class="btn btn-secondary btn-lg" id="hero-explore-forecast">
+              Explore Forecast
+            </a>
           </div>
         </div>
+
+        <!-- Right: Floating Weather Widget Card -->
+        <div class="hero-card-col">
+          <div class="hero-weather-card" id="hero-weather-widget">
+            <div class="hero-card-header">
+              <div class="hero-weather-location">
+                📍 <span id="hero-loc-name">New Delhi, India</span>
+              </div>
+              <div class="hero-weather-date" id="hero-date">Fri, 15 Oct, 03:00 PM</div>
+            </div>
+
+            <div class="hero-weather-body">
+              <div>
+                <span class="hero-temp-value" id="hero-temp">32</span><span class="hero-temp-unit">°C</span>
+              </div>
+              <div class="hero-weather-icon" id="hero-emoji">🌤️</div>
+            </div>
+
+            <div class="hero-weather-condition" id="hero-condition">Haze</div>
+
+            <div class="hero-weather-footer">
+              <div class="hero-weather-highlow">
+                <span>High: <strong id="hero-high">34°C</strong></span> &nbsp;/&nbsp;
+                <span>Low: <strong id="hero-low">22°C</strong></span>
+              </div>
+              <div class="hero-aqi-pill" id="hero-aqi-badge">
+                <span class="hero-aqi-dot"></span>
+                <span>AQI <strong id="hero-aqi">182</strong> · Unhealthy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
 
-    <!-- Floating logo visual -->
-    <div class="hero-visual" aria-hidden="true">
-      <img src="assets/logo-transparent.png" alt="Mausam Setu">
+      <!-- Bottom: 4 Horizontal Quick Nav Cards (Screen 1) -->
+      <div class="hero-nav-cards">
+        <a href="forecast.html" class="hero-nav-card" id="card-forecast">
+          <div class="card-icon-wrap forecast-icon">☀️</div>
+          <div class="hero-nav-card-text">
+            <span class="hero-nav-card-title">Forecast</span>
+            <span class="hero-nav-card-sub">Plan your day</span>
+          </div>
+        </a>
+
+        <a href="map.html" class="hero-nav-card" id="card-maps">
+          <div class="card-icon-wrap maps-icon">📍</div>
+          <div class="hero-nav-card-text">
+            <span class="hero-nav-card-title">Weather Maps</span>
+            <span class="hero-nav-card-sub">Explore weather</span>
+          </div>
+        </a>
+
+        <a href="alerts.html" class="hero-nav-card" id="card-alerts">
+          <div class="card-icon-wrap alerts-icon">🔔</div>
+          <div class="hero-nav-card-text">
+            <span class="hero-nav-card-title">Severe Alerts</span>
+            <span class="hero-nav-card-sub">Stay informed</span>
+          </div>
+        </a>
+
+        <a href="dashboard.html" class="hero-nav-card" id="card-dashboard">
+          <div class="card-icon-wrap climate-icon">📈</div>
+          <div class="hero-nav-card-text">
+            <span class="hero-nav-card-title">Climate Insights</span>
+            <span class="hero-nav-card-sub">Bigger picture</span>
+          </div>
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -142,42 +165,40 @@
     <div class="container">
       <div class="section-header-center">
         <div class="section-eyebrow">Why Mausam Setu</div>
-        <h2 class="section-heading" id="features-title">
-          Complete Early-Warning<br>Pipeline
-        </h2>
+        <h2 class="section-heading" id="features-title">Connecting Citizens with Safety</h2>
         <p class="section-subtext">
           From your GPS location to verified weather data to AI-powered safety guidance —
-          covering every step of disaster preparedness.
+          covering the complete early-warning pipeline.
         </p>
       </div>
 
       <div class="feature-grid">
-        <div class="feature-card fade-in">
+        <div class="feature-card">
           <div class="feature-icon-wrap">📍</div>
           <div class="feature-title">GPS-Based Alerts</div>
-          <p class="feature-desc">Location-matched warnings. If a cyclone, flood, or heatwave is near you, you'll know immediately with specific safety actions for your area.</p>
+          <p class="feature-desc">Location-matched warnings. If a cyclone, flood, or heatwave is near you, know immediately with safety actions for your specific area.</p>
         </div>
-        <div class="feature-card fade-in delay-100">
+        <div class="feature-card">
           <div class="feature-icon-wrap">🤖</div>
           <div class="feature-title">WeatherGPT Assistant</div>
           <p class="feature-desc">Ask "Is it safe to travel?" or "Will it rain tomorrow?" in English or Hindi. Our AI answers using verified weather data — never guessing.</p>
         </div>
-        <div class="feature-card fade-in delay-200">
+        <div class="feature-card">
           <div class="feature-icon-wrap">🚨</div>
           <div class="feature-title">4-Level Alert System</div>
           <p class="feature-desc">WATCH → ADVISORY → WARNING → EMERGENCY. Clear severity hierarchy for Flood, Cyclone, Heatwave, Lightning, and Heavy Rain events.</p>
         </div>
-        <div class="feature-card fade-in delay-300">
+        <div class="feature-card">
           <div class="feature-icon-wrap">📅</div>
           <div class="feature-title">7-Day Forecast</div>
-          <p class="feature-desc">Hourly and daily forecasts with rain probability, temperature range, wind speed, and condition — helping you plan ahead safely.</p>
+          <p class="feature-desc">Hourly and daily forecasts with rain probability, temperature range, wind speed, and conditions — plan ahead safely.</p>
         </div>
-        <div class="feature-card fade-in delay-400">
+        <div class="feature-card">
           <div class="feature-icon-wrap">🇮🇳</div>
           <div class="feature-title">Hindi &amp; English</div>
           <p class="feature-desc">Full bilingual support. Switch between English and Hindi instantly. Architecture ready for more Indian regional languages.</p>
         </div>
-        <div class="feature-card fade-in delay-500">
+        <div class="feature-card">
           <div class="feature-icon-wrap">🗺️</div>
           <div class="feature-title">Disaster Map</div>
           <p class="feature-desc">Interactive map showing your location, active alert zones, and live rainfall data. Instantly answers: "Is danger near me?"</p>
@@ -216,25 +237,20 @@
     <div class="container">
       <div class="section-header-center">
         <div class="section-eyebrow">Specialized Modes</div>
-        <h2 class="section-heading" id="modes-title">
-          Tailored for Every<br>Indian Citizen
-        </h2>
-        <p class="section-subtext">
-          Specialized dashboards for farmers and fishermen who depend on accurate weather information for their livelihoods and lives.
-        </p>
+        <h2 class="section-heading" id="modes-title">Tailored for Every Indian Citizen</h2>
+        <p class="section-subtext">Specialized dashboards for those who need accurate weather information most critically.</p>
       </div>
-
       <div class="mode-grid">
-        <a href="farmer.html" class="mode-card fade-in" id="farmer-mode-link">
+        <a href="farmer.html" class="mode-card" id="farmer-mode-link">
           <span class="mode-card-icon">🌾</span>
           <div class="mode-card-title">Farmer Mode</div>
-          <p class="mode-card-desc">Rainfall forecasts, sowing & harvesting advisories, crop-specific temperature alerts, and soil moisture guidance for agricultural planning.</p>
+          <p class="mode-card-desc">Rainfall forecasts, sowing & harvesting advisories, and crop-specific temperature alerts for agricultural planning.</p>
           <div class="mode-card-cta">Access Farmer Dashboard <span>→</span></div>
         </a>
-        <a href="fisherman.html" class="mode-card fade-in delay-200" id="fisherman-mode-link">
+        <a href="fisherman.html" class="mode-card" id="fisherman-mode-link">
           <span class="mode-card-icon">⚓</span>
           <div class="mode-card-title">Fisherman Mode</div>
-          <p class="mode-card-desc">Wind speed, sea conditions, cyclone proximity, wave height, and coastal safety warnings tailored for fishing communities along India's coast.</p>
+          <p class="mode-card-desc">Wind speed, sea conditions, cyclone proximity, and coastal safety warnings tailored for fishing communities.</p>
           <div class="mode-card-cta">Access Fisherman Dashboard <span>→</span></div>
         </a>
       </div>
@@ -244,24 +260,12 @@
   <!-- ── CTA SECTION ─────────────────────────────────────── -->
   <section class="cta-section" aria-labelledby="cta-title">
     <div class="container">
-      <div class="hero-badge" style="margin:0 auto var(--space-6)">
-        <span>✨</span>
-        <span>Free — No Hidden Costs</span>
-      </div>
-      <h2 class="cta-title" id="cta-title">
-        Don't wait for danger<br>to find you.
-      </h2>
-      <p class="cta-sub">
-        Get location-based weather alerts and AI safety guidance before it's too late.
-        Join thousands of citizens across India.
-      </p>
+      <h2 class="cta-title" id="cta-title">Don't wait for danger to find you.</h2>
+      <p class="cta-sub">Get location-based weather alerts and AI safety guidance before it's too late.</p>
       <div class="cta-buttons">
-        <a href="login.html" class="btn btn-primary btn-lg" id="cta-signup">
-          🚀 Create Free Account
-        </a>
-        <a href="dashboard.html" class="btn btn-glass btn-lg" id="cta-dashboard">
-          🌤️ Explore Dashboard
-        </a>
+        <a href="login.html" class="btn btn-white btn-lg" id="cta-signup">🚀 Create Free Account</a>
+        <a href="dashboard.html" class="btn btn-outline btn-lg" id="cta-dashboard"
+          style="color:white;border-color:rgba(255,255,255,0.5)">🌤️ View Dashboard</a>
       </div>
     </div>
   </section>
@@ -273,10 +277,10 @@
     <div class="footer-grid">
       <div>
         <div class="footer-brand">
-          <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" style="height:32px;width:auto;filter:drop-shadow(0 0 12px rgba(0,212,255,0.3))">
+          <img src="assets/logo-transparent.png" alt="Mausam Setu" style="height:28px;filter:brightness(0) invert(1)">
           <span>Mausam Setu</span>
         </div>
-        <p class="footer-tagline">Connecting Citizens with Weather, Warnings &amp; Safety across India.</p>
+        <p class="footer-tagline">Your trusted weather companion across India.</p>
         <div class="org-badge">🇮🇳 Disaster Management Division</div>
       </div>
       <div>
@@ -286,7 +290,7 @@
           <a href="forecast.html">Forecast</a>
           <a href="alerts.html">Alerts</a>
           <a href="chat.html">WeatherGPT</a>
-          <a href="map.html">Disaster Map</a>
+          <a href="map.html">Maps</a>
         </div>
       </div>
       <div>
@@ -301,11 +305,11 @@
       <div>
         <div class="footer-col-title">Emergency</div>
         <div class="footer-col-links">
-          <span style="color:var(--rose-400);font-size:var(--text-sm);font-weight:700">NDMA: 1078</span>
-          <span style="color:var(--text-dim);font-size:var(--text-sm)">National: 112</span>
-          <span style="color:var(--text-dim);font-size:var(--text-sm)">Ambulance: 108</span>
-          <span style="color:var(--text-dim);font-size:var(--text-sm)">Police: 100</span>
-          <span style="color:var(--text-dim);font-size:var(--text-sm)">Fire: 101</span>
+          <span style="color:#FCA5A5;font-weight:700">NDMA: 1078</span>
+          <span>National: 112</span>
+          <span>Ambulance: 108</span>
+          <span>Police: 100</span>
+          <span>Fire: 101</span>
         </div>
       </div>
     </div>
@@ -326,10 +330,9 @@
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
 <script>
-  // ── Init ─────────────────────────────────────────────────
   LangManager.init();
 
-  // Hamburger menu
+  // Hamburger
   const hamburger = document.getElementById('hamburger-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   hamburger.addEventListener('click', () => {
@@ -337,7 +340,6 @@
     hamburger.setAttribute('aria-expanded', isOpen);
     hamburger.textContent = isOpen ? '✕' : '☰';
   });
-
   document.addEventListener('click', e => {
     if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
       mobileMenu.classList.remove('open');
@@ -346,7 +348,103 @@
     }
   });
 
-  // Intersection observer — fade-in on scroll
+  // Set date in widget
+  const dateEl = document.getElementById('hero-date');
+  if (dateEl) {
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('en-IN', {
+      weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
+    }) + ' • ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Load live weather for hero widget via OpenWeatherMap
+  async function loadHeroWeather() {
+    try {
+      const apiKey = (typeof MS_CONFIG !== 'undefined' && MS_CONFIG.OPENWEATHER_KEY)
+        ? MS_CONFIG.OPENWEATHER_KEY : null;
+
+      if (!apiKey || apiKey === 'YOUR_OPENWEATHER_API_KEY') return;
+
+      // Try geolocation first
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async pos => {
+          const { latitude: lat, longitude: lon } = pos.coords;
+          const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+          );
+          if (!res.ok) return;
+          const d = await res.json();
+          updateHeroWidget(d);
+        }, () => loadNewDelhi(apiKey));
+      } else {
+        loadNewDelhi(apiKey);
+      }
+    } catch (e) { /* silent fallback */ }
+  }
+
+  async function loadNewDelhi(apiKey) {
+    try {
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=New Delhi,IN&appid=${apiKey}&units=metric`
+      );
+      if (!res.ok) return;
+      const d = await res.json();
+      updateHeroWidget(d);
+    } catch(e) {}
+  }
+
+  function updateHeroWidget(d) {
+    const t = Math.round(d.main.temp);
+    const hi = Math.round(d.main.temp_max);
+    const lo = Math.round(d.main.temp_min);
+    const city = d.name + ', ' + (d.sys?.country || 'India');
+
+    const tempEl = document.getElementById('hero-temp');
+    if (tempEl) tempEl.textContent = t;
+    const hiEl = document.getElementById('hero-high');
+    if (hiEl) hiEl.textContent = hi + '°C';
+    const loEl = document.getElementById('hero-low');
+    if (loEl) loEl.textContent = lo + '°C';
+    const condEl = document.getElementById('hero-condition');
+    if (condEl && d.weather?.[0]) {
+      condEl.textContent = d.weather[0].description.replace(/\b\w/g, c => c.toUpperCase());
+    }
+    const locEl = document.getElementById('hero-loc-name');
+    if (locEl) locEl.textContent = city;
+
+    // Date formatting matching reference: Fri, 15 Oct, 03:00 PM
+    const dateEl = document.getElementById('hero-date');
+    if (dateEl) {
+      const now = new Date();
+      const options = { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true };
+      dateEl.textContent = now.toLocaleDateString('en-IN', options);
+    }
+
+    // Emoji map
+    const id = d.weather?.[0]?.id || 800;
+    let em = '🌤️';
+    if (id >= 200 && id < 300) em = '⛈️';
+    else if (id >= 300 && id < 500) em = '🌦️';
+    else if (id >= 500 && id < 600) em = '🌧️';
+    else if (id >= 600 && id < 700) em = '❄️';
+    else if (id >= 700 && id < 800) em = '🌫️';
+    else if (id === 800) em = '☀️';
+    else if (id > 800) em = '⛅';
+    const emojiEl = document.getElementById('hero-emoji');
+    if (emojiEl) emojiEl.textContent = em;
+  }
+
+  // Set current date right away
+  const dateEl = document.getElementById('hero-date');
+  if (dateEl) {
+    const now = new Date();
+    const options = { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true };
+    dateEl.textContent = now.toLocaleDateString('en-IN', options);
+  }
+
+  loadHeroWeather();
+
+  // Fade-in on scroll
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -355,20 +453,14 @@
         observer.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.1 });
 
   document.querySelectorAll('.feature-card, .mode-card').forEach(el => {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(28px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     observer.observe(el);
   });
-
-  // Animate stats counters
-  const stats = [
-    { el: document.querySelector('.hero-stats .hero-stat:nth-child(1) .hero-stat-num'), target: 10, suffix: '+' },
-    { el: document.querySelector('.hero-stats .hero-stat:nth-child(2) .hero-stat-num'), target: 2, suffix: '' },
-  ];
 </script>
 </body>
 </html>
