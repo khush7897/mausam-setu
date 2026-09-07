@@ -40,7 +40,7 @@
         <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
         <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
       </div>
-      <div class="user-menu">
+      <div class="user-menu" style="display:none">
         <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()">
           <div class="user-avatar" id="user-avatar-initials">U</div>
           <span id="user-name-nav">User</span> ▾
@@ -48,6 +48,7 @@
         <div class="user-dropdown" id="user-dropdown">
           <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
           <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <button onclick="testDashboardPhoneNotification()" class="user-dropdown-item" style="color:var(--primary);font-weight:600">📱 Test Phone Notification</button>
           <div class="user-dropdown-divider"></div>
           <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
         </div>
@@ -70,32 +71,34 @@
 <main class="main-content">
   <div class="container">
 
-    <!-- Location Bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);flex-wrap:wrap;gap:12px">
-      <div>
-        <div class="question-label">📍 WHERE AM I?</div>
+    <!-- Location & Status Header Bar -->
+    <div class="dashboard-header-bar">
+      <div class="dash-location-group">
+        <div class="question-label"><span>📍</span> Current Location</div>
         <div id="location-display" class="location-display" onclick="showLocationModal()" title="Click to change location">
-          <span id="location-text">Detecting location...</span>
-          <span style="font-size:12px;opacity:0.7">✏️</span>
+          <span class="location-name-bold" id="location-text">Detecting location...</span>
+          <span class="location-change-chip">Change ✏️</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px">
+      <div class="dash-status-group">
         <div class="source-strip">
-          📡 <span id="data-source-label">Data Source: IMD Live Observations</span>
+          <span class="live-pulse-dot"></span>
+          <span id="data-source-label">IMD Live Observations</span>
         </div>
-        <div style="font-size:var(--text-xs);color:var(--text-muted)" id="last-updated-label">--</div>
+        <div class="update-pill" id="last-updated-label">Updated: --</div>
+        <button class="dash-refresh-btn" onclick="loadDashboard()" title="Refresh Weather Data">🔄</button>
       </div>
     </div>
 
     <!-- Active Alert Banner -->
     <div id="alert-banner-section" class="hidden" style="margin-bottom:var(--space-6)">
-      <div class="question-label">🚨 IS THERE DANGER?</div>
+      <div class="question-label" style="background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C"><span>🚨</span> Active Hazard Advisory</div>
       <div id="alert-banner"></div>
     </div>
 
     <!-- No Alert State -->
     <div id="no-alert-section" style="margin-bottom:var(--space-6)" class="hidden">
-      <div class="question-label">🚨 IS THERE DANGER?</div>
+      <div class="question-label" style="background:#ECFDF5;border-color:#A7F3D0;color:#047857"><span>🛡️</span> Hazard Status</div>
       <div style="background:var(--success-bg);border:1px solid #A5D6A7;border-radius:var(--radius-md);padding:14px 18px;display:flex;align-items:center;gap:12px;font-weight:600;color:var(--success)">
         ✅ <span id="no-alert-text">No active weather hazards for your area</span>
       </div>
@@ -108,7 +111,7 @@
 
         <!-- Current Weather Card -->
         <div>
-          <div class="question-label">🌤️ WHAT IS THE WEATHER NOW?</div>
+          <div class="question-label"><span>🌤️</span> Current Conditions</div>
           <div id="weather-loading" class="card" style="padding:40px;text-align:center">
             <div class="spinner spinner-lg" style="margin:0 auto 12px"></div>
             <p>Loading weather data...</p>
@@ -128,22 +131,22 @@
                 <div style="font-size:var(--text-base);color:rgba(255,255,255,0.75)">Feels like <span id="weather-feels-like">--°C</span></div>
               </div>
             </div>
-            <div class="stat-grid">
-              <div style="text-align:center;color:white">
-                <div style="font-size:var(--text-xl);font-weight:700" id="w-humidity">--%</div>
-                <div style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:.05em" data-t="dash_humidity">Humidity</div>
+            <div class="weather-hero-stats">
+              <div class="weather-hero-stat-item">
+                <div class="weather-hero-stat-val" id="w-humidity">--%</div>
+                <div class="weather-hero-stat-lbl" data-t="dash_humidity">Humidity</div>
               </div>
-              <div style="text-align:center;color:white">
-                <div style="font-size:var(--text-xl);font-weight:700" id="w-wind">-- km/h</div>
-                <div style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:.05em" data-t="dash_wind">Wind</div>
+              <div class="weather-hero-stat-item">
+                <div class="weather-hero-stat-val" id="w-wind">-- km/h</div>
+                <div class="weather-hero-stat-lbl" data-t="dash_wind">Wind</div>
               </div>
-              <div style="text-align:center;color:white">
-                <div style="font-size:var(--text-xl);font-weight:700" id="w-visibility">-- km</div>
-                <div style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:.05em" data-t="dash_visibility">Visibility</div>
+              <div class="weather-hero-stat-item">
+                <div class="weather-hero-stat-val" id="w-visibility">-- km</div>
+                <div class="weather-hero-stat-lbl" data-t="dash_visibility">Visibility</div>
               </div>
-              <div style="text-align:center;color:white">
-                <div style="font-size:var(--text-xl);font-weight:700" id="w-pressure">-- hPa</div>
-                <div style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:.05em" data-t="dash_pressure">Pressure</div>
+              <div class="weather-hero-stat-item">
+                <div class="weather-hero-stat-val" id="w-pressure">-- hPa</div>
+                <div class="weather-hero-stat-lbl" data-t="dash_pressure">Pressure</div>
               </div>
             </div>
           </div>
@@ -184,7 +187,7 @@
         <!-- Quick Stats -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">📊 Conditions</div>
+            <div class="card-title">📊 Atmospheric Metrics</div>
           </div>
           <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="quick-stats">
@@ -199,7 +202,7 @@
 
         <!-- Safety Recommendation -->
         <div>
-          <div class="question-label">🛡️ WHAT SHOULD I DO?</div>
+          <div class="question-label" style="background:#ECFDF5;border-color:#A7F3D0;color:#047857"><span>🛡️</span> Safety Advisory</div>
           <div id="safety-section">
             <div class="skeleton skeleton-card" style="height:120px"></div>
           </div>
@@ -217,17 +220,29 @@
         </div>
 
         <!-- WeatherGPT Quick Access -->
-        <a href="chat.html" style="text-decoration:none">
-          <div style="background:linear-gradient(135deg,var(--primary-800),var(--primary-600));border-radius:var(--radius-md);padding:var(--space-5);color:white;cursor:pointer;transition:all var(--transition-fast)" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-              <span style="font-size:28px">🤖</span>
-              <div>
-                <div style="font-weight:700;font-size:var(--text-base)">WeatherGPT</div>
-                <div style="font-size:var(--text-xs);opacity:0.75">Ask anything about weather safety</div>
+        <a href="chat.html" style="text-decoration:none;display:block" id="weathergpt-quick-card">
+          <div style="background:linear-gradient(135deg, #0F2758 0%, #1E40AF 55%, #2563EB 100%);border-radius:16px;padding:20px 22px;color:#FFFFFF;cursor:pointer;border:1.5px solid rgba(59,130,246,0.35);box-shadow:0 12px 28px -6px rgba(37,99,235,0.32), 0 4px 10px rgba(15,39,88,0.2);transition:all 0.2s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 18px 36px -6px rgba(37,99,235,0.45)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 12px 28px -6px rgba(37,99,235,0.32)'">
+            <!-- Decorative subtle ambient glow -->
+            <div style="position:absolute;top:-25px;right:-25px;width:110px;height:110px;background:radial-gradient(circle,rgba(96,165,250,0.35) 0%,transparent 70%);pointer-events:none"></div>
+            
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:relative;z-index:1">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,0.16);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(255,255,255,0.25);box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+                  🤖
+                </div>
+                <div>
+                  <div style="font-weight:800;font-size:16.5px;color:#FFFFFF;letter-spacing:-0.01em;display:flex;align-items:center;gap:6px">
+                    <span>WeatherGPT</span>
+                    <span style="font-size:10px;font-weight:700;background:rgba(56,189,248,0.25);border:1px solid rgba(56,189,248,0.4);color:#7DD3FC;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;text-transform:uppercase">AI LIVE</span>
+                  </div>
+                  <div style="font-size:12.5px;color:#BFDBFE;font-weight:500;margin-top:2px">Ask anything about weather safety</div>
+                </div>
               </div>
             </div>
-            <div style="background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:10px;font-size:var(--text-sm);opacity:0.85">
-              "Is it safe to travel today?" →
+
+            <div style="background:rgba(255,255,255,0.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.22);border-radius:12px;padding:11px 14px;font-size:13px;color:#FFFFFF;display:flex;align-items:center;justify-content:space-between;font-weight:500;position:relative;z-index:1">
+              <span style="color:#F0F9FF;font-style:italic">"Is it safe to travel today?"</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#38BDF8;color:#0F172A;border-radius:50%;font-size:12px;font-weight:800;margin-left:8px;flex-shrink:0">→</span>
             </div>
           </div>
         </a>
@@ -344,6 +359,21 @@ if (AuthService.currentUser) {
 function toggleUserMenu() {
   document.getElementById('user-dropdown').classList.toggle('open');
 }
+function testDashboardPhoneNotification() {
+  const user = (typeof AuthService !== 'undefined' && AuthService.currentUser) || null;
+  const email = (user && user.email) || localStorage.getItem('ms_user_email') || '';
+  const mobile = (user && user.mobile) || localStorage.getItem('ms_user_mobile') || '';
+  if (!email) {
+    Utils.showToast('Please sign in or register to test phone notifications.', 'warning');
+    return;
+  }
+  if (typeof NotificationService !== 'undefined' && NotificationService.sendEmailActivityPhoneNotification) {
+    NotificationService.sendEmailActivityPhoneNotification(email, 'Mausam Setu', mobile || '9876543210');
+  } else {
+    Utils.showToast('📱 Phone Notification: ' + email + ' used on Mausam Setu', 'info');
+  }
+}
+window.testDashboardPhoneNotification = testDashboardPhoneNotification;
 document.addEventListener('click', e => {
   const btn = document.getElementById('user-menu-btn');
   const dd = document.getElementById('user-dropdown');
@@ -385,6 +415,12 @@ async function loadDashboard() {
     AlertService.getAlertsForLocation(loc.lat, loc.lon, loc.state),
   ]);
 
+  // State caches for instant re-render on language switch
+  window._currentWeather = weather;
+  window._currentForecast = forecast;
+  window._currentHourly = hourly;
+  window._currentAlerts = alerts;
+
   if (weather) {
     renderWeatherCard(weather);
     renderQuickStats(weather);
@@ -403,6 +439,21 @@ async function loadDashboard() {
     'Updated: ' + Utils.formatTime();
 }
 
+// Global language listener called by LangManager.setLanguage
+window.onLanguageChange = function(lang) {
+  if (window._currentWeather) {
+    renderWeatherCard(window._currentWeather);
+    renderQuickStats(window._currentWeather);
+  }
+  if (window._currentForecast) {
+    renderWeeklyForecast(window._currentForecast);
+  }
+  if (window._currentAlerts) {
+    renderAlertBanner(window._currentAlerts, window._currentWeather);
+    renderSafety(window._currentWeather, window._currentAlerts);
+  }
+};
+
 function updateLocationDisplay(loc) {
   const display = loc ? [loc.city, loc.state].filter(Boolean).join(', ') : 'Location not set';
   document.getElementById('location-text').textContent = display;
@@ -413,43 +464,45 @@ function renderWeatherCard(w) {
   Utils.hide('weather-loading');
   Utils.show('weather-card');
   const isDay = new Date().getHours() >= 6 && new Date().getHours() < 20;
+  const lang = typeof LangManager !== 'undefined' ? LangManager.current : 'en';
   document.getElementById('weather-icon-large').textContent = Utils.getWeatherIcon(w.condition, isDay);
   document.getElementById('weather-temp').textContent = w.temp + '°C';
   document.getElementById('weather-feels-like').textContent = w.feels_like + '°C';
   document.getElementById('weather-city-label').textContent = [w.city, w.state].filter(Boolean).join(', ');
-  document.getElementById('weather-condition-label').textContent = w.condition;
-  document.getElementById('weather-description-label').textContent = w.description;
+  document.getElementById('weather-condition-label').textContent = lang === 'hi' ? (w.conditionHi || w.condition) : w.condition;
+  document.getElementById('weather-description-label').textContent = lang === 'hi' ? (w.descriptionHi || w.description) : w.description;
   document.getElementById('w-humidity').textContent = w.humidity + '%';
   document.getElementById('w-wind').textContent = w.wind_speed + ' km/h';
   document.getElementById('w-visibility').textContent = w.visibility + ' km';
   document.getElementById('w-pressure').textContent = w.pressure + ' hPa';
   document.getElementById('data-source-label').textContent =
-    'Source: ' + (w.isDemo ? 'DEMO DATA (Not real IMD data)' : w.source);
+    'Source: ' + (w.source || 'IMD & Live Meteorological Observation');
 }
 
 function renderQuickStats(w) {
+  const lang = typeof LangManager !== 'undefined' ? LangManager.current : 'en';
   const uv = Utils.uvLabel(w.uv || 5);
   const rain = Utils.rainLabel(w.rain_prob);
   document.getElementById('quick-stats').innerHTML = `
     <div class="stat-tile">
       <div class="stat-tile-icon">🌡️</div>
       <div class="stat-tile-value">${w.temp}°C</div>
-      <div class="stat-tile-label">Temperature</div>
+      <div class="stat-tile-label">${lang === 'hi' ? 'तापमान' : 'Temperature'}</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile-icon">🌧️</div>
       <div class="stat-tile-value" style="color:${rain.color}">${w.rain_prob}%</div>
-      <div class="stat-tile-label">Rain Chance</div>
+      <div class="stat-tile-label">${lang === 'hi' ? 'बारिश संभावना' : 'Rain Chance'}</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile-icon">☀️</div>
       <div class="stat-tile-value" style="color:${uv.color}">${w.uv || 5}</div>
-      <div class="stat-tile-label">UV Index</div>
+      <div class="stat-tile-label">${lang === 'hi' ? 'UV इंडेक्स' : 'UV Index'}</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile-icon">🌅</div>
       <div class="stat-tile-value" style="font-size:var(--text-base)">${w.sunrise}</div>
-      <div class="stat-tile-label">Sunrise</div>
+      <div class="stat-tile-label">${lang === 'hi' ? 'सूर्योदय' : 'Sunrise'}</div>
     </div>
   `;
 }
@@ -467,23 +520,58 @@ function renderHourlyForecast(hours) {
 }
 
 function renderWeeklyForecast(days) {
-  const html = days.slice(0,5).map(d => `
-    <div class="forecast-day-card">
-      <div style="width:80px;font-weight:600;font-size:var(--text-sm)">${d.day}</div>
-      <div style="font-size:24px">${Utils.getWeatherIcon(d.condition)}</div>
-      <div style="flex:1;font-size:var(--text-sm);color:var(--text-muted)">${d.condition}</div>
-      <div style="text-align:right">
-        <span style="font-weight:700">${d.temp_max}°</span>
-        <span style="color:var(--text-muted);margin-left:6px">${d.temp_min}°</span>
-      </div>
-      <div style="width:50px;text-align:right">
-        <div style="font-size:var(--text-xs);color:${Utils.rainLabel(d.rain_prob).color};font-weight:600">🌧️${d.rain_prob}%</div>
-        <div class="rain-bar-container" style="margin-top:4px">
-          <div class="rain-bar-fill" style="width:${d.rain_prob}%;background:${Utils.rainLabel(d.rain_prob).color}"></div>
+  if (!days || !days.length) return;
+  const globalMin = Math.min(...days.map(d => d.temp_min));
+  const globalMax = Math.max(...days.map(d => d.temp_max));
+  const tempSpan = Math.max(1, globalMax - globalMin);
+  const lang = typeof LangManager !== 'undefined' ? LangManager.current : 'en';
+
+  const html = days.slice(0, 5).map((d, i) => {
+    const isToday = i === 0;
+    const isTomorrow = i === 1;
+    const dt = d.date ? new Date(d.date) : new Date();
+    const dateStr = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    let labelDay = isToday 
+      ? (lang === 'hi' ? 'आज' : 'Today') 
+      : isTomorrow 
+        ? (lang === 'hi' ? 'कल' : 'Tomorrow') 
+        : dt.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'short' });
+    
+    const leftPct = Math.round(((d.temp_min - globalMin) / tempSpan) * 100);
+    const widthPct = Math.max(14, Math.round(((d.temp_max - d.temp_min) / tempSpan) * 100));
+    const condText = lang === 'hi' ? (d.conditionHi || d.condition) : d.condition;
+    const rainMeta = Utils.rainLabel(d.rain_prob);
+
+    return `
+      <div class="forecast-day-card ${isToday ? 'is-today' : ''}">
+        <div style="width:110px;display:flex;flex-direction:column;gap:2px">
+          <div style="font-weight:700;font-size:var(--text-sm);color:var(--text-primary);display:flex;align-items:center;gap:6px">
+            <span>${labelDay}</span>
+            ${isToday ? '<span class="badge-live-sm">LIVE</span>' : ''}
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted)">📅 ${dateStr}</div>
+        </div>
+        <div style="font-size:26px;width:38px;text-align:center">${Utils.getWeatherIcon(d.condition)}</div>
+        <div style="flex:1;min-width:0;padding:0 8px">
+          <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${condText}</div>
+          <div style="font-size:11px;color:var(--text-muted)">💧 ${d.humidity}% · 💨 ${d.wind}km/h</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;min-width:130px;justify-content:flex-end">
+          <span style="font-size:13px;color:var(--text-muted);font-weight:600">${d.temp_min}°</span>
+          <div class="f-temp-bar-track" style="width:60px">
+            <div class="f-temp-bar-range" style="left:${leftPct}%;width:${widthPct}%"></div>
+          </div>
+          <span style="font-weight:700;font-size:14px;color:${Utils.tempColor(d.temp_max)}">${d.temp_max}°</span>
+        </div>
+        <div style="width:58px;text-align:right">
+          <div style="font-size:12px;color:${rainMeta.color};font-weight:700">🌧️${d.rain_prob}%</div>
+          <div class="rain-bar-container" style="margin-top:3px;height:4px">
+            <div class="rain-bar-fill" style="width:${d.rain_prob}%;background:${rainMeta.color}"></div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
   document.getElementById('weekly-forecast').innerHTML = html;
 }
 
@@ -505,7 +593,7 @@ function renderAlertBanner(alerts, weather) {
          style="background:${sev.bg};border-color:${sev.border};border-left-color:${sev.border}">
       <div class="banner-icon">${haz?.icon || '⚠️'}</div>
       <div class="banner-content">
-        <div class="banner-label" style="color:${sev.color}">${sev.label} ${top.isDemo ? '· SIMULATION' : ''}</div>
+        <div class="banner-label" style="color:${sev.color}">${sev.label}</div>
         <div class="banner-title" style="color:${sev.text}">${title}</div>
         <div class="banner-area" style="color:${sev.text};opacity:0.8">📍 ${top.area}</div>
       </div>

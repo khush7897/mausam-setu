@@ -84,6 +84,88 @@
     @media (max-width: 480px) {
       .reg-row-2 { grid-template-columns: 1fr; gap: var(--space-3); }
     }
+
+    /* ── Forgot Password Modal Styles (High-Contrast Clean Light Glassmorphism) ── */
+    .forgot-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+    }
+    .forgot-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+    }
+    .forgot-modal-card {
+      position: relative;
+      background: #FFFFFF !important;
+      color: #0F172A !important;
+      border: 1.5px solid #E2E8F0 !important;
+      border-radius: 22px !important;
+      box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.3), 0 0 35px rgba(37, 99, 235, 0.12) !important;
+      width: 100%;
+      max-width: 470px;
+      padding: 30px 28px !important;
+      z-index: 1001;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .forgot-modal-card h2,
+    .forgot-modal-card h3 {
+      color: #0F172A !important;
+    }
+    .forgot-modal-card p {
+      color: #475569 !important;
+    }
+    .forgot-modal-card .form-label {
+      color: #0F172A !important;
+      font-weight: 700 !important;
+      font-size: 13.5px !important;
+      margin-bottom: 6px !important;
+    }
+    .forgot-modal-card .form-input {
+      background: #FFFFFF !important;
+      color: #0F172A !important;
+      border: 1.5px solid #CBD5E1 !important;
+      font-weight: 600 !important;
+      font-size: 14.5px !important;
+    }
+    .forgot-modal-card .form-input:focus {
+      border-color: #2563EB !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    }
+    .forgot-modal-card .form-input::placeholder {
+      color: #94A3B8 !important;
+    }
+    .forgot-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #F1F5F9 !important;
+      border: 1px solid #CBD5E1 !important;
+      color: #475569 !important;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .forgot-modal-close:hover {
+      background: #E2E8F0 !important;
+      color: #0F172A !important;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -182,9 +264,14 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="login-pass">
-                Password <span class="required">*</span>
-              </label>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <label class="form-label" for="login-pass" style="margin-bottom:0">
+                  Password <span class="required">*</span>
+                </label>
+                <a href="#" onclick="openForgotPassword(event)" style="font-size:12px;color:var(--cyan-400);text-decoration:none;font-weight:600;letter-spacing:0.02em" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                  Forgot Password?
+                </a>
+              </div>
               <div class="pw-wrapper">
                 <input type="password" id="login-pass" class="form-input"
                   placeholder="Enter your password"
@@ -315,11 +402,163 @@
   </div>
 </div>
 
+<!-- ── Forgot Password Modal Dialog ────────────────────────── -->
+<div id="forgot-modal" class="forgot-modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="forgot-modal-title">
+  <div class="forgot-modal-backdrop" onclick="closeForgotPassword()"></div>
+  <div class="forgot-modal-card">
+    <button type="button" class="forgot-modal-close" onclick="closeForgotPassword()" aria-label="Close modal">✕</button>
+    
+    <!-- Modal Header -->
+    <div style="text-align:center;margin-bottom:var(--space-5)">
+      <div style="width:54px;height:54px;margin:0 auto 12px;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px">
+        🔐
+      </div>
+      <h2 id="forgot-modal-title" style="font-size:1.45rem;font-weight:800;color:#0F172A !important;margin:0 0 6px 0">
+        Reset Password
+      </h2>
+      <p style="font-size:13.5px;color:#475569 !important;margin:0;line-height:1.5;font-weight:500">
+        Recover your account using a secure 6-digit OTP sent to your registered email or mobile number.
+      </p>
+    </div>
+
+    <!-- Step 1: Request OTP -->
+    <div id="forgot-step-1">
+      <form id="forgot-form-1" onsubmit="handleForgotRequestOtp(event)">
+        <div class="form-group">
+          <label class="form-label" for="forgot-identifier" style="color:#0F172A !important;font-weight:700 !important;font-size:13.5px !important;margin-bottom:6px !important">
+            Registered Email or 10-Digit Mobile <span class="required">*</span>
+          </label>
+          <input type="text" id="forgot-identifier" class="form-input"
+            placeholder="e.g. yourname@gmail.com or 9876543210" required autocomplete="username"
+            style="background:#FFFFFF !important;color:#0F172A !important;border:1.5px solid #CBD5E1 !important;font-weight:600 !important;font-size:14.5px !important">
+        </div>
+
+        <div style="background:#EFF6FF !important;border:1.5px solid #BFDBFE !important;border-radius:12px;padding:12px 14px;margin-bottom:var(--space-4);display:flex;align-items:flex-start;gap:10px">
+          <span style="font-size:18px">📲</span>
+          <span style="font-size:13px;color:#1E40AF !important;line-height:1.45;font-weight:600">
+            A 6-digit verification code will be dispatched to your registered credentials for authentication.
+          </span>
+        </div>
+
+        <div id="forgot-error-1" class="form-error hidden" style="margin-bottom:12px">
+          <span>⚠️</span> <span id="forgot-error-msg-1"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="forgot-btn-1" style="font-size:14.5px;font-weight:700">
+          <span id="forgot-btn-text-1">Send Verification Code 📩</span>
+          <div class="spinner hidden" id="forgot-spinner-1"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: Verify OTP & Enter New Password -->
+    <div id="forgot-step-2" style="display:none">
+      <form id="forgot-form-2" onsubmit="handleForgotResetPassword(event)">
+        <!-- Destination alert badge -->
+        <div style="background:#ECFDF5 !important;border:1.5px solid #A7F3D0 !important;border-radius:12px;padding:12px 14px;margin-bottom:var(--space-3);text-align:left">
+          <div style="font-size:11px;font-weight:800;color:#059669 !important;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px">
+            ● Verification Code Dispatched
+          </div>
+          <div style="font-size:13px;color:#065F46 !important;font-weight:700" id="forgot-dest-text">
+            Code sent to your email & mobile.
+          </div>
+        </div>
+
+        <!-- Instant In-App Verification Code Box -->
+        <div id="forgot-otp-box" style="background:#F0F9FF !important;border:1.5px dashed #38BDF8 !important;border-radius:14px;padding:14px 14px;margin-bottom:var(--space-4);text-align:center">
+          <div style="font-size:11.5px;font-weight:800;color:#0284C7 !important;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">
+            🔑 Instant Verification Code
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
+            <span id="forgot-otp-display-code" style="font-family:monospace;font-size:26px;font-weight:900;letter-spacing:6px;color:#0284C7 !important;background:#FFFFFF !important;padding:6px 16px;border-radius:8px;border:2px solid #BAE6FD !important;box-shadow:0 2px 8px rgba(2,132,199,0.1)">
+              ------
+            </span>
+            <button type="button" onclick="autoFillForgotOtp()" class="btn btn-sm btn-primary" style="padding:7px 14px;font-size:12px;font-weight:700;background:#2563EB !important;color:#FFFFFF !important">
+              ⚡ Auto-Fill
+            </button>
+          </div>
+          <div style="font-size:12px;color:#475569 !important;line-height:1.4;font-weight:600">
+            Verification code has been auto-filled. Just enter your new password below!
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="forgot-otp" style="color:#0F172A !important;font-weight:700 !important;font-size:13.5px !important;margin-bottom:6px !important">
+            6-Digit Verification Code (OTP) <span class="required">*</span>
+          </label>
+          <input type="text" id="forgot-otp" class="form-input"
+            placeholder="• • • • • •" maxlength="6"
+            style="letter-spacing:8px;text-align:center;font-size:22px;font-weight:800;font-family:monospace;color:#1E40AF !important;background:#FFFFFF !important;border:2px solid #93C5FD !important"
+            required autocomplete="one-time-code">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="forgot-new-pass" style="color:#0F172A !important;font-weight:700 !important;font-size:13.5px !important;margin-bottom:6px !important">
+            New Password <span class="required">*</span>
+          </label>
+          <div class="pw-wrapper">
+            <input type="password" id="forgot-new-pass" class="form-input"
+              placeholder="At least 6 characters" required minlength="6" autocomplete="new-password"
+              style="background:#FFFFFF !important;color:#0F172A !important;border:1.5px solid #CBD5E1 !important;font-weight:600 !important;font-size:14.5px !important">
+            <button type="button" class="pw-toggle" onclick="togglePassword('forgot-new-pass', this)" aria-label="Toggle password visibility" style="color:#64748B !important">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="forgot-confirm-pass" style="color:#0F172A !important;font-weight:700 !important;font-size:13.5px !important;margin-bottom:6px !important">
+            Confirm New Password <span class="required">*</span>
+          </label>
+          <div class="pw-wrapper">
+            <input type="password" id="forgot-confirm-pass" class="form-input"
+              placeholder="Re-enter new password" required minlength="6" autocomplete="new-password"
+              style="background:#FFFFFF !important;color:#0F172A !important;border:1.5px solid #CBD5E1 !important;font-weight:600 !important;font-size:14.5px !important">
+            <button type="button" class="pw-toggle" onclick="togglePassword('forgot-confirm-pass', this)" aria-label="Toggle password visibility" style="color:#64748B !important">👁️</button>
+          </div>
+        </div>
+
+        <div id="forgot-error-2" class="form-error hidden" style="margin-bottom:12px">
+          <span>⚠️</span> <span id="forgot-error-msg-2"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="forgot-btn-2" style="font-size:14.5px;font-weight:700">
+          <span id="forgot-btn-text-2">Reset Password & Save 🔒</span>
+          <div class="spinner hidden" id="forgot-spinner-2"></div>
+        </button>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:12.5px">
+          <button type="button" onclick="backToStep1()" style="background:none;border:none;color:#475569 !important;cursor:pointer;padding:0;font-size:12.5px;font-weight:600">
+            ← Change Credentials
+          </button>
+          <button type="button" id="forgot-resend-btn" onclick="resendOtp()" style="background:none;border:none;color:#2563EB !important;cursor:pointer;font-weight:700;font-size:12.5px;padding:0">
+            Resend OTP 🔄
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Success View -->
+    <div id="forgot-step-3" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <h3 style="font-size:1.35rem;font-weight:800;color:#059669 !important;margin:0 0 8px 0">
+        Password Reset Successful!
+      </h3>
+      <p style="font-size:13.5px;color:#475569 !important;margin:0 0 24px 0;line-height:1.5;font-weight:500">
+        Your new password has been securely updated in the database. You can now log in to Mausam Setu with your updated credentials.
+      </p>
+      <button type="button" onclick="proceedToLoginAfterReset()" class="btn btn-primary btn-full btn-lg" style="font-size:15px;font-weight:700">
+        Log In to Account →
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/location.js"></script>
 <script>
   LangManager.init();
   AuthService.init();
@@ -411,8 +650,13 @@
     const result = await AuthService.login(id, pass);
     setLoading('login', false);
     if (result.success) {
-      Utils.showToast('Welcome, ' + result.user.name + '! 🎉', 'success');
-      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 800);
+      const email = result.user.email || (isValidEmail(id) ? id : (result.user.name.toLowerCase().replace(/\s+/g, '') + '@gmail.com'));
+      const phone = result.user.mobile || '9876543210';
+      if (typeof NotificationService !== 'undefined' && NotificationService.sendEmailActivityPhoneNotification) {
+        NotificationService.sendEmailActivityPhoneNotification(email, 'Mausam Setu', phone);
+      }
+      Utils.showToast('Welcome, ' + result.user.name + '! 🎉 Security alert sent to your phone.', 'success');
+      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 2000);
     } else {
       showError('login', result.error);
     }
@@ -463,12 +707,292 @@
     setLoading('reg', false);
 
     if (result.success) {
-      Utils.showToast('Account created! Welcome to Mausam Setu 🎉', 'success');
-      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 800);
+      if (typeof NotificationService !== 'undefined' && NotificationService.sendEmailActivityPhoneNotification) {
+        NotificationService.sendEmailActivityPhoneNotification(email, 'Mausam Setu', mobile);
+      }
+      Utils.showToast('Account created! Phone notification dispatched for ' + email, 'success');
+      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 2000);
     } else {
       showError('reg', result.error);
     }
   });
+
+  // ── Forgot Password Logic ──────────────────────────────
+  let currentForgotIdentifier = '';
+  let currentForgotDevOtp = '';
+
+  function openForgotPassword(e) {
+    if (e) e.preventDefault();
+    const currentLoginId = document.getElementById('login-id').value.trim();
+    if (currentLoginId) {
+      document.getElementById('forgot-identifier').value = currentLoginId;
+    }
+    document.getElementById('forgot-step-1').style.display = 'block';
+    document.getElementById('forgot-step-2').style.display = 'none';
+    document.getElementById('forgot-step-3').style.display = 'none';
+    hideForgotError(1);
+    hideForgotError(2);
+    document.getElementById('forgot-modal').style.display = 'flex';
+    setTimeout(() => {
+      document.getElementById('forgot-identifier').focus();
+    }, 100);
+  }
+  window.openForgotPassword = openForgotPassword;
+
+  function closeForgotPassword() {
+    document.getElementById('forgot-modal').style.display = 'none';
+  }
+  window.closeForgotPassword = closeForgotPassword;
+
+  function showForgotError(step, msg) {
+    const errEl = document.getElementById(`forgot-error-${step}`);
+    const msgEl = document.getElementById(`forgot-error-msg-${step}`);
+    if (errEl && msgEl) {
+      msgEl.textContent = msg;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  function hideForgotError(step) {
+    const errEl = document.getElementById(`forgot-error-${step}`);
+    if (errEl) errEl.classList.add('hidden');
+  }
+
+  function setForgotLoading(step, loading, defaultText) {
+    const btn = document.getElementById(`forgot-btn-${step}`);
+    const txt = document.getElementById(`forgot-btn-text-${step}`);
+    const spin = document.getElementById(`forgot-spinner-${step}`);
+    if (btn) btn.disabled = loading;
+    if (txt) txt.textContent = loading ? 'Please wait...' : defaultText;
+    if (spin) spin.classList.toggle('hidden', !loading);
+  }
+
+  async function handleForgotRequestOtp(e) {
+    e.preventDefault();
+    hideForgotError(1);
+    const id = document.getElementById('forgot-identifier').value.trim();
+    if (!id) {
+      showForgotError(1, 'Please enter your registered email or 10-digit mobile number.');
+      return;
+    }
+
+    setForgotLoading(1, true, 'Send Verification Code 📩');
+    try {
+      const res = await fetch(AuthService.getApiUrl('/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: id }),
+      });
+      const data = await res.json();
+      setForgotLoading(1, false, 'Send Verification Code 📩');
+
+      if (!data.success) {
+        showForgotError(1, data.error || 'No matching registered account found.');
+        return;
+      }
+
+      currentForgotIdentifier = id;
+      currentForgotDevOtp = data.devOtp || '';
+
+      // Format destination banner text
+      let destText = '';
+      if (data.destination && data.destination.email && data.destination.mobile) {
+        destText = `Code sent to ${data.destination.email} and ${data.destination.mobile}`;
+      } else if (data.destination && data.destination.email) {
+        destText = `Code sent to ${data.destination.email}`;
+      } else if (data.destination && data.destination.mobile) {
+        destText = `Code sent to ${data.destination.mobile}`;
+      } else {
+        destText = 'Code sent to your registered email & mobile.';
+      }
+      document.getElementById('forgot-dest-text').textContent = destText;
+
+      // Transition to step 2
+      document.getElementById('forgot-step-1').style.display = 'none';
+      document.getElementById('forgot-step-2').style.display = 'block';
+
+      // Display & prefill OTP code for instant verification
+      const otpDisplay = document.getElementById('forgot-otp-display-code');
+      if (otpDisplay && data.devOtp) {
+        otpDisplay.textContent = data.devOtp;
+      }
+      const otpInput = document.getElementById('forgot-otp');
+      if (otpInput && data.devOtp) {
+        otpInput.value = data.devOtp;
+      }
+
+      document.getElementById('forgot-new-pass').value = '';
+      document.getElementById('forgot-confirm-pass').value = '';
+      hideForgotError(2);
+      setTimeout(() => document.getElementById('forgot-new-pass').focus(), 100);
+
+      Utils.showToast('Verification OTP dispatched! 📩', 'success');
+
+      // Helpful development alert
+      if (data.devOtp) {
+        setTimeout(() => {
+          Utils.showToast(`🔑 Verification OTP: ${data.devOtp}`, 'info', 7000);
+        }, 500);
+      }
+    } catch (err) {
+      setForgotLoading(1, false, 'Send Verification Code 📩');
+      showForgotError(1, 'Network error. Please make sure the server is reachable.');
+    }
+  }
+  window.handleForgotRequestOtp = handleForgotRequestOtp;
+
+  function autoFillForgotOtp() {
+    if (currentForgotDevOtp) {
+      const input = document.getElementById('forgot-otp');
+      if (input) input.value = currentForgotDevOtp;
+      Utils.showToast('OTP auto-filled! ⚡', 'success');
+      document.getElementById('forgot-new-pass').focus();
+    }
+  }
+  window.autoFillForgotOtp = autoFillForgotOtp;
+
+  async function handleForgotResetPassword(e) {
+    e.preventDefault();
+    hideForgotError(2);
+
+    const otp = document.getElementById('forgot-otp').value.trim();
+    const newPass = document.getElementById('forgot-new-pass').value;
+    const confirmPass = document.getElementById('forgot-confirm-pass').value;
+
+    if (!otp || otp.length !== 6) {
+      showForgotError(2, 'Please enter the valid 6-digit OTP code.');
+      document.getElementById('forgot-otp').focus();
+      return;
+    }
+
+    if (newPass.length < 6) {
+      showForgotError(2, 'Password must be at least 6 characters long.');
+      document.getElementById('forgot-new-pass').focus();
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      showForgotError(2, 'Passwords do not match. Please verify and re-enter.');
+      document.getElementById('forgot-confirm-pass').focus();
+      return;
+    }
+
+    setForgotLoading(2, true, 'Reset Password & Save 🔒');
+    try {
+      const res = await fetch(AuthService.getApiUrl('/reset-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identifier: currentForgotIdentifier,
+          otp: otp,
+          new_password: newPass,
+        }),
+      });
+      const data = await res.json();
+      setForgotLoading(2, false, 'Reset Password & Save 🔒');
+
+      if (!data.success) {
+        showForgotError(2, data.error || 'Password reset failed. Please check OTP.');
+        return;
+      }
+
+      // Step 3: Success View
+      document.getElementById('forgot-step-2').style.display = 'none';
+      document.getElementById('forgot-step-3').style.display = 'block';
+      Utils.showToast('Password updated successfully! 🎉', 'success');
+    } catch (err) {
+      setForgotLoading(2, false, 'Reset Password & Save 🔒');
+      showForgotError(2, 'Network error. Please try again.');
+    }
+  }
+  window.handleForgotResetPassword = handleForgotResetPassword;
+
+  function backToStep1() {
+    document.getElementById('forgot-step-2').style.display = 'none';
+    document.getElementById('forgot-step-1').style.display = 'block';
+    hideForgotError(1);
+    setTimeout(() => document.getElementById('forgot-identifier').focus(), 100);
+  }
+  window.backToStep1 = backToStep1;
+
+  async function resendOtp() {
+    if (!currentForgotIdentifier) return;
+    const resendBtn = document.getElementById('forgot-resend-btn');
+    if (resendBtn) {
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'Sending...';
+    }
+    try {
+      const res = await fetch(AuthService.getApiUrl('/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: currentForgotIdentifier }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        currentForgotDevOtp = data.devOtp || '';
+        const otpDisplay = document.getElementById('forgot-otp-display-code');
+        if (otpDisplay && data.devOtp) otpDisplay.textContent = data.devOtp;
+        const otpInput = document.getElementById('forgot-otp');
+        if (otpInput && data.devOtp) otpInput.value = data.devOtp;
+
+        Utils.showToast('New OTP dispatched! 📩', 'success');
+        if (data.devOtp) {
+          setTimeout(() => Utils.showToast(`🔑 New OTP: ${data.devOtp}`, 'info', 7000), 500);
+        }
+        if (resendBtn) {
+          let timer = 30;
+          const iv = setInterval(() => {
+            timer--;
+            if (timer <= 0) {
+              clearInterval(iv);
+              resendBtn.disabled = false;
+              resendBtn.textContent = 'Resend OTP 🔄';
+            } else {
+              resendBtn.textContent = `Resend in ${timer}s`;
+            }
+          }, 1000);
+        }
+      } else {
+        Utils.showToast(data.error || 'Could not resend OTP.', 'error');
+        if (resendBtn) {
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend OTP 🔄';
+        }
+      }
+    } catch (e) {
+      if (resendBtn) {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend OTP 🔄';
+      }
+    }
+  }
+  window.resendOtp = resendOtp;
+
+  function proceedToLoginAfterReset() {
+    closeForgotPassword();
+    switchTab('login');
+    if (currentForgotIdentifier) {
+      document.getElementById('login-id').value = currentForgotIdentifier;
+    }
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+  window.proceedToLoginAfterReset = proceedToLoginAfterReset;
+
+  // Escape key closes modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeForgotPassword();
+  });
+
+  // Page Initialization
+  if (typeof LangManager !== 'undefined') LangManager.init();
+  if (typeof AuthService !== 'undefined') {
+    AuthService.init();
+    if (AuthService.isLoggedIn()) {
+      window.location.href = MS_CONFIG.ROUTES.DASHBOARD;
+    }
+  }
 </script>
 </body>
 </html>

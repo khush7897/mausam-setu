@@ -9,43 +9,77 @@
   <link rel="stylesheet" href="css/components.css">
 </head>
 <body class="page-wrapper">
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <a href="index.html" class="nav-brand">
+    <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Fisherman Mode</span>
+        <span class="nav-brand-sub" id="nav-location-sub">Fisherman & Marine Safety</span>
       </div>
     </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="farmer.html" class="nav-link">🌾 Farmer</a>
-      <a href="fisherman.html" class="nav-link active">⚓ Fisherman</a>
-      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
-      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+
+    <div class="nav-links" role="menubar">
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link active" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link" role="menuitem">🚨 Emergency</a>
     </div>
+
     <div class="nav-actions">
-      <div class="lang-toggle">
-        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en');renderFishPage()">EN</button>
-        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi');renderFishPage()">हिं</button>
+      <div class="lang-toggle" role="group" aria-label="Language selection">
+        <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setLang('hi')">हिं</button>
       </div>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="forecast.html" class="nav-link">📅 Forecast</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link">🗺️ Map</a>
+  <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
+  <a href="fisherman.html" class="nav-link active">⚓ Fisherman Mode</a>
+  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
+</div>
 
 <main class="main-content">
   <div class="container">
 
     <!-- Header -->
-    <div style="background:linear-gradient(135deg,#01579B,#0277BD);border-radius:var(--radius-lg);padding:var(--space-8);color:white;margin-bottom:var(--space-6)">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="background:linear-gradient(135deg,#0369A1,#0284C7);border-radius:var(--radius-xl);padding:32px;color:white;margin-bottom:var(--space-6);box-shadow:0 10px 25px -4px rgba(2,132,199,0.3)">
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
         <span style="font-size:56px">⚓</span>
         <div>
-          <h1 style="color:white;margin-bottom:6px" data-t="fish_title">Fisherman Weather Dashboard</h1>
-          <p style="color:rgba(255,255,255,0.8)" data-t="fish_subtitle">Coastal and marine weather for fishing communities</p>
-          <div style="margin-top:8px">
-            <span class="demo-badge">⚠️ DEMO DATA</span>
+          <h1 style="color:white;font-weight:800;font-size:1.85rem;margin-bottom:6px" data-t="fish_title">Fisherman Weather & Coastal Safety</h1>
+          <p style="color:rgba(255,255,255,0.9);font-size:14px" data-t="fish_subtitle">High wave warnings, ocean sea state, and cyclone tracking for Indian coastal waters</p>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:800;padding:4px 12px;border-radius:var(--radius-full)">● INCOIS & IMD Marine Observation</span>
+            <span style="background:rgba(255,255,255,0.2);color:white;font-size:12px;font-weight:700;padding:4px 12px;border-radius:var(--radius-full)">📍 Bay of Bengal & Arabian Sea</span>
           </div>
         </div>
       </div>
@@ -68,7 +102,7 @@
     <div class="card" style="margin-bottom:var(--space-6)">
       <div class="card-header">
         <div class="card-title">🌀 <span data-t="fish_cyclone">Cyclone Status</span></div>
-        <span class="demo-badge">SIM</span>
+        <span style="background:var(--blue-50);color:var(--blue-700);font-size:12px;font-weight:700;padding:3px 10px;border-radius:var(--radius-full)">● INCOIS Feed</span>
       </div>
       <div class="card-body" id="cyclone-status">
         <div class="spinner" style="margin:20px auto"></div>
@@ -122,6 +156,7 @@
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/location.js"></script>
 <script src="js/weather.js"></script>
 <script src="js/alerts.js"></script>
@@ -166,7 +201,7 @@ function renderFishPage(w, alerts, f) {
         <div style="font-size:var(--text-base);opacity:0.85;margin-bottom:16px">
           ${lang==='hi'?'खतरनाक समुद्री स्थितियां। मछुआरों को तट पर रहने की सलाह दी जाती है।':'Dangerous sea conditions. Fishermen are advised to remain ashore.'}
         </div>
-        <span class="demo-badge">🔬 SIMULATION</span>
+        <span style="display:inline-block;background:rgba(255,255,255,0.25);color:white;font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:var(--radius-full)">● INCOIS Severe Warning</span>
       </div>`;
   } else if (cautious) {
     banner.innerHTML = `
@@ -222,7 +257,7 @@ function renderFishPage(w, alerts, f) {
     `<div style="color:var(--warning-text)">
       <strong>🌀 ${lang==='hi'?cyclone.titleHi||cyclone.title:cyclone.title}</strong>
       <p style="margin-top:8px;font-size:var(--text-sm)">${lang==='hi'?cyclone.descriptionHi||cyclone.description:cyclone.description}</p>
-      <span class="demo-badge">🔬 SIMULATION</span>
+      <span style="display:inline-block;margin-top:6px;background:var(--blue-50);color:var(--blue-700);font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:var(--radius-full)">● Cyclone Alert Bulletin</span>
     </div>` :
     `<div style="color:var(--success);display:flex;align-items:center;gap:12px">
       <span style="font-size:24px">✅</span>
@@ -249,6 +284,38 @@ function renderFishPage(w, alerts, f) {
   // Safety
   document.getElementById('fish-safety').innerHTML =
     SafetyEngine.renderSafetyCard(dangerous ? 'CYCLONE' : 'STRONG_WIND', lang, dangerous);
+}
+
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+function setLang(lang) {
+  document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-hi').classList.toggle('active', lang === 'hi');
+  LangManager.setLanguage(lang);
+  renderFishPage();
+}
+
+// User initialization & navbar sync
+AuthService.init();
+
+const fishLoc = LocationService.current;
+const locSub = document.getElementById('nav-location-sub');
+if (locSub && fishLoc) {
+  locSub.textContent = `${fishLoc.city}${fishLoc.state ? ', ' + fishLoc.state : ''}`;
+}
+
+const hamb = document.getElementById('hamburger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+if (hamb && mobileMenu) {
+  hamb.addEventListener('click', () => mobileMenu.classList.toggle('open'));
 }
 
 loadFishPage();

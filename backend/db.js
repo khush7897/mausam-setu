@@ -56,23 +56,47 @@ const initSqlite = async () => {
     );
     CREATE INDEX IF NOT EXISTS idx_users_mobile ON users(mobile_number);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+    CREATE TABLE IF NOT EXISTS password_resets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      identifier TEXT NOT NULL,
+      otp TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_resets_identifier ON password_resets(identifier);
+
+    CREATE TABLE IF NOT EXISTS chat_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT,
+      session_id TEXT,
+      sender TEXT NOT NULL,
+      message TEXT NOT NULL,
+      raw_response TEXT,
+      city TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_history(user_id);
+    CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_history(session_id);
   `);
 
-  // Seed demo users if empty
-  const countRow = sqliteDb.prepare('SELECT COUNT(*) as count FROM users').get();
-  if (!countRow || countRow.count === 0) {
-    const insertStmt = sqliteDb.prepare(`
-      INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
+  // Seed demo users only if explicitly requested via SEED_DEMO environment variable
+  if (process.env.SEED_DEMO === 'true') {
+    const countRow = sqliteDb.prepare('SELECT COUNT(*) as count FROM users').get();
+    if (!countRow || countRow.count === 0) {
+      const insertStmt = sqliteDb.prepare(`
+        INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
 
-    for (const u of DEMO_SEEDS) {
-      const salt = await bcryptjs.genSalt(10);
-      const hash = await bcryptjs.hash(u.pass, salt);
-      const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
-      insertStmt.run(uuid, u.name, u.mobile, u.email, u.role, u.state, hash);
+      for (const u of DEMO_SEEDS) {
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(u.pass, salt);
+        const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
+        insertStmt.run(uuid, u.name, u.mobile, u.email, u.role, u.state, hash);
+      }
+      console.log('✓ SQLite database initialized with pre-seeded demo users.');
     }
-    console.log('✓ SQLite database initialized with pre-seeded demo users.');
   }
 
   activeEngine = 'sqlite';
@@ -131,21 +155,45 @@ const initMysql = async () => {
         INDEX idx_mobile (mobile_number),
         INDEX idx_email (email)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+      CREATE TABLE IF NOT EXISTS password_resets (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        identifier VARCHAR(255) NOT NULL,
+        otp VARCHAR(10) NOT NULL,
+        expires_at BIGINT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_resets_id (identifier)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+      CREATE TABLE IF NOT EXISTS chat_history (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id VARCHAR(100),
+        session_id VARCHAR(100),
+        sender VARCHAR(10) NOT NULL,
+        message TEXT NOT NULL,
+        raw_response TEXT,
+        city VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_chat_user (user_id),
+        INDEX idx_chat_session (session_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // Check count and seed if empty
-    const [rows] = await conn.query('SELECT COUNT(*) as count FROM users');
-    if (rows[0].count === 0) {
-      for (const u of DEMO_SEEDS) {
-        const salt = await bcryptjs.genSalt(10);
-        const hash = await bcryptjs.hash(u.pass, salt);
-        const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
-        await conn.query(
-          'INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [uuid, u.name, u.mobile, u.email, u.role, u.state, hash]
-        );
+    // Check count and seed if empty (only when SEED_DEMO is explicitly requested)
+    if (process.env.SEED_DEMO === 'true') {
+      const [rows] = await conn.query('SELECT COUNT(*) as count FROM users');
+      if (rows[0].count === 0) {
+        for (const u of DEMO_SEEDS) {
+          const salt = await bcryptjs.genSalt(10);
+          const hash = await bcryptjs.hash(u.pass, salt);
+          const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
+          await conn.query(
+            'INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [uuid, u.name, u.mobile, u.email, u.role, u.state, hash]
+          );
+        }
+        console.log('✓ MySQL database initialized with pre-seeded demo users.');
       }
-      console.log('✓ MySQL database initialized with pre-seeded demo users.');
     }
   } finally {
     conn.release();

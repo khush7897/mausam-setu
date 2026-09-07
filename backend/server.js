@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
+import aiRoutes from './routes/ai.js';
 import pool, { initDatabase } from './db.js';
 
 // Setup __dirname for ES Modules
@@ -34,6 +35,7 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve Frontend Static Files from repository root
 app.use(express.static(path.join(__dirname, '../')));

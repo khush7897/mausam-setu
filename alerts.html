@@ -11,31 +11,63 @@
 </head>
 <body class="page-wrapper">
 
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <a href="index.html" class="nav-brand">
+    <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Alert Center</span>
+        <span class="nav-brand-sub" id="nav-location-sub">Raipur, Chhattisgarh</span>
       </div>
     </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="forecast.html" class="nav-link">📅 Forecast</a>
-      <a href="alerts.html" class="nav-link active">⚠️ Alerts</a>
-      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
-      <a href="map.html" class="nav-link">🗺️ Map</a>
+
+    <div class="nav-links" role="menubar">
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link active nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link" role="menuitem">🚨 Emergency</a>
     </div>
+
     <div class="nav-actions">
-      <div class="lang-toggle">
-        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en');renderAlerts()">EN</button>
-        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi');renderAlerts()">हिं</button>
+      <div class="lang-toggle" role="group" aria-label="Language selection">
+        <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setLang('hi')">हिं</button>
       </div>
-      <button class="nav-hamburger" id="hamburger-btn">☰</button>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="forecast.html" class="nav-link">📅 Forecast</a>
+  <a href="alerts.html" class="nav-link active">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link">🗺️ Map</a>
+  <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
+  <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
+  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
+</div>
 
 <main class="main-content">
   <div class="container">
@@ -188,12 +220,41 @@ function renderSafetyGrid() {
   }).join('');
 }
 
-loadAlerts();
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+function setLang(lang) {
+  document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-hi').classList.toggle('active', lang === 'hi');
+  LangManager.setLanguage(lang);
+  renderAlerts();
+  renderSafetyGrid();
+}
+
+// Initialize user & navbar sync
+AuthService.init();
+
+const loc = LocationService.current;
+const locSub = document.getElementById('nav-location-sub');
+if (locSub && loc) {
+  locSub.textContent = `${loc.city}${loc.state ? ', ' + loc.state : ''}`;
+}
 
 // Hamburger
-document.getElementById('hamburger-btn').addEventListener('click', function() {
-  // mobile menu toggle
-});
+const hamb = document.getElementById('hamburger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+if (hamb && mobileMenu) {
+  hamb.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+}
+
+loadAlerts();
 </script>
 </body>
 </html>

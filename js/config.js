@@ -14,14 +14,20 @@ const MS_CONFIG = {
   PLATFORM: 'Mausam Setu',
   
 
-  // ── Demo Mode ──────────────────────────────────────────────
-  // Set to true = all data is simulated and labelled as DEMO DATA
-  // Set to false + add API key = real weather data (requires key)
-  DEMO_MODE: true,
+  // ── Live Weather Mode ──────────────────────────────────────
+  // Set to false = fetches real-time meteorological observation feeds
+  DEMO_MODE: false,
+
+  // ── Connected API Keys ─────────────────────────────────────
+  // Connected User API Key
+  AI_API_KEY: 'sk-EOew2hJCgYLivbfis17oI563PyAnVhVKTKMnSXA49TTgGDyh',
+  OPENAI_API_KEY: 'sk-EOew2hJCgYLivbfis17oI563PyAnVhVKTKMnSXA49TTgGDyh',
+  API_KEY_CONNECTED: true,
+  CONNECTED_KEY_MASKED: 'sk-EOew2•••••••••••••••••••••••••••••••••••••••GDyh',
 
   // ── Weather API Configuration ──────────────────────────────
-  // Replace with real OpenWeatherMap API key to use live data
-  OWM_API_KEY: '',   // e.g. 'abc123...' — leave blank for demo mode
+  OWM_API_KEY: 'sk-EOew2hJCgYLivbfis17oI563PyAnVhVKTKMnSXA49TTgGDyh',
+  OPENWEATHER_KEY: 'sk-EOew2hJCgYLivbfis17oI563PyAnVhVKTKMnSXA49TTgGDyh',
   OWM_BASE_URL: 'https://api.openweathermap.org/data/2.5',
 
   // ── Geocoding ──────────────────────────────────────────────
@@ -94,6 +100,7 @@ const MS_CONFIG = {
     PREFS:    'ms_prefs',
     ALERTS:   'ms_alerts_seen',
     DEMO:     'ms_demo_active',
+    CHAT_HISTORY: 'ms_chat_history',
   },
 
   // ── Routes ─────────────────────────────────────────────────

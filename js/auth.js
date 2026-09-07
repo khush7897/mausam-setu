@@ -28,10 +28,28 @@ const AuthService = {
     return `/api/auth${endpoint}`;
   },
 
+  SESSION_VERSION: 'v2_clean_reset',
+
   // ── Initialize ────────────────────────────────────────────
   init() {
+    // Purge stale test sessions so app begins completely fresh
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const savedVersion = localStorage.getItem('ms_session_v');
+        if (savedVersion !== this.SESSION_VERSION) {
+          localStorage.removeItem(MS_CONFIG.STORAGE.USER);
+          localStorage.removeItem('ms_user_email');
+          localStorage.removeItem('ms_user_mobile');
+          localStorage.removeItem('ms_email_notifications');
+          localStorage.setItem('ms_session_v', this.SESSION_VERSION);
+          this.currentUser = null;
+        }
+      } catch (e) {}
+    }
+
     const stored = Utils.retrieve(MS_CONFIG.STORAGE.USER);
     if (stored) this.currentUser = stored;
+    try { this.updateNav(); } catch {}
     return this.currentUser;
   },
 
@@ -152,7 +170,56 @@ const AuthService = {
     this.currentUser = null;
     Utils.remove(MS_CONFIG.STORAGE.USER);
     Utils.remove(MS_CONFIG.STORAGE.LOCATION);
-    window.location.href = MS_CONFIG.ROUTES.HOME;
+    Utils.remove('ms_user_email');
+    Utils.remove('ms_user_mobile');
+    try { sessionStorage.clear(); } catch {}
+    
+    // Clear cookies if any
+    try {
+      document.cookie.split(";").forEach(c => { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+    } catch {}
+
+    // Show feedback toast and redirect to login page
+    if (typeof Utils !== 'undefined' && Utils.showToast) {
+      Utils.showToast('You have been logged out successfully.', 'info');
+    }
+    setTimeout(() => {
+      window.location.href = MS_CONFIG.ROUTES.LOGIN;
+    }, 350);
+  },
+
+  // ── Navbar State Synchronizer ─────────────────────────────
+  updateNav() {
+    if (typeof document === 'undefined') return;
+    const user = this.getCurrentUser();
+    const userMenu = document.querySelector('.user-menu');
+    const nameEl = document.getElementById('user-name-nav');
+    const avatarEl = document.getElementById('user-avatar-initials');
+    const adminLink = document.getElementById('admin-link');
+    const navActions = document.querySelector('.nav-actions');
+
+    if (user && user.name) {
+      if (nameEl) nameEl.textContent = user.name.split(' ')[0];
+      if (avatarEl) avatarEl.textContent = this.getUserInitials();
+      if (adminLink) adminLink.style.display = this.isAdmin() ? 'flex' : 'none';
+      if (userMenu) userMenu.style.display = 'inline-flex';
+      const signinBtn = document.getElementById('nav-signin-btn');
+      if (signinBtn) signinBtn.remove();
+    } else {
+      // User is logged out
+      if (userMenu) userMenu.style.display = 'none';
+      if (navActions && !document.getElementById('nav-signin-btn')) {
+        const signinBtn = document.createElement('a');
+        signinBtn.id = 'nav-signin-btn';
+        signinBtn.href = MS_CONFIG.ROUTES.LOGIN;
+        signinBtn.className = 'btn btn-primary btn-sm';
+        signinBtn.style.cssText = 'padding:6px 16px;font-size:13px;font-weight:700;border-radius:20px;text-decoration:none;display:inline-flex;align-items:center;gap:6px';
+        signinBtn.innerHTML = '<span>🔑</span> <span>Sign In</span>';
+        navActions.appendChild(signinBtn);
+      }
+    }
   },
 
   // ── Guards ────────────────────────────────────────────────
@@ -167,8 +234,8 @@ const AuthService = {
   requireAdmin() {
     const user = this.getCurrentUser();
     if (!user || user.role !== 'admin') {
-      Utils.showToast(LangManager.t('admin_unauthorized'), 'error');
-      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.DASHBOARD, 1500);
+      Utils.showToast(LangManager?.t('admin_unauthorized') || 'Admin access required. Please sign in.', 'error');
+      setTimeout(() => window.location.href = MS_CONFIG.ROUTES.LOGIN, 1200);
       return false;
     }
     return true;
@@ -182,6 +249,14 @@ const AuthService = {
     if (!user?.name) return 'U';
     return user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   },
+};
+
+// Auto-sync nav on init
+const origInit = AuthService.init.bind(AuthService);
+AuthService.init = function() {
+  const u = origInit();
+  try { this.updateNav(); } catch {}
+  return u;
 };
 
 window.AuthService = AuthService;

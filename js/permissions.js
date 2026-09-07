@@ -172,6 +172,11 @@ const PermissionsManager = {
           >
             🛡️ Confirm Permissions & Access Mausam Setu
           </button>
+          <div style="display:flex;justify-content:center;margin-top:2px">
+            <button type="button" class="perm-demo-bypass-btn" onclick="PermissionsManager.quickDemoBypass()">
+              ⚡ Fast Track (Auto-fill Demo & Enter)
+            </button>
+          </div>
           <div class="perm-security-note">
             🔒 Your data is protected. Emergency numbers are solely utilized for disaster preparedness communications.
           </div>
@@ -186,6 +191,24 @@ const PermissionsManager = {
 
     // Auto check if browser permissions already granted
     this.checkExistingPermissions();
+  },
+
+  quickDemoBypass() {
+    this.state.phone = '9876543210';
+    this.state.gpsGranted = true;
+    this.state.micGranted = true;
+    this.state.notifGranted = true;
+    this.state.locationData = { city: 'Raipur', state: 'Chhattisgarh', lat: 21.2514, lon: 81.6296 };
+    const phoneInput = document.getElementById('perm-phone-input');
+    if (phoneInput) {
+      phoneInput.value = '9876543210';
+      phoneInput.classList.add('valid');
+    }
+    this.updateItemUI('gps', true, 'Raipur GPS');
+    this.updateItemUI('mic', true);
+    this.updateItemUI('notif', true);
+    this.checkCompletion();
+    setTimeout(() => this.submitAndEnter(), 250);
   },
 
   async checkExistingPermissions() {

@@ -20,6 +20,21 @@
   --blue-100:  #DBEAFE;
   --blue-50:   #EFF6FF;
 
+  /* Primary Aliases */
+  --primary:       #2563EB;
+  --primary-dark:  #1D4ED8;
+  --primary-light: #3B82F6;
+  --primary-900:   #0C1E40;
+  --primary-800:   #1A3466;
+  --primary-700:   #1E4080;
+  --primary-600:   #2563EB;
+  --primary-500:   #3B82F6;
+  --primary-400:   #60A5FA;
+  --primary-300:   #93C5FD;
+  --primary-200:   #BFDBFE;
+  --primary-100:   #DBEAFE;
+  --primary-50:    #EFF6FF;
+
   /* Neutral */
   --white:     #FFFFFF;
   --gray-50:   #F8FAFC;
@@ -131,7 +146,11 @@
   padding: 0;
 }
 
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
 
 body {
   font-family: var(--font-sans);
@@ -141,6 +160,7 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 body.lang-hi { font-family: var(--font-deva); }

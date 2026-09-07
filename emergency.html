@@ -3,158 +3,448 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emergency Information — Mausam Setu</title>
+  <title>Emergency Helplines & Disaster Guide — Mausam Setu</title>
+  <meta name="description" content="Verified official government emergency helplines, disaster preparedness guides, and emergency survival kit checklist for India.">
   <link rel="icon" type="image/png" href="assets/logo-transparent.png">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <style>
+    .kit-item-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .kit-item-card:hover {
+      border-color: var(--blue-400);
+      background: var(--blue-50);
+      transform: translateY(-1px);
+    }
+    .kit-item-card.checked {
+      background: #F0FDF4;
+      border-color: #86EFAC;
+    }
+    .kit-item-card.checked .kit-text {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .helpline-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-xs);
+      transition: all 0.2s ease;
+    }
+    .helpline-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: #FCA5A5;
+    }
+    .source-portal-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+    .source-portal-card:hover {
+      border-color: var(--blue-400);
+      box-shadow: var(--shadow-xs);
+      background: #F8FAFC;
+    }
+  </style>
 </head>
-<body class="page-wrapper">
-<nav class="navbar">
+<body class="page-wrapper" style="background:#F8FAFC">
+
+<!-- Top Navigation (Matching Image 1 Reference) -->
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <a href="index.html" class="nav-brand">
+    <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Emergency</span>
+        <span class="nav-brand-sub" id="nav-location-sub">Raipur, Chhattisgarh</span>
       </div>
     </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
-      <a href="emergency.html" class="nav-link active">🚨 Emergency</a>
+
+    <div class="nav-links" role="menubar">
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link active" role="menuitem">🚨 Emergency</a>
     </div>
+
     <div class="nav-actions">
-      <div class="lang-toggle">
-        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
-        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      <div class="lang-toggle" role="group" aria-label="Language selection">
+        <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setLang('hi')">हिं</button>
       </div>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
 
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="forecast.html" class="nav-link">📅 Forecast</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link">🗺️ Map</a>
+  <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
+  <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
+  <a href="emergency.html" class="nav-link active">🚨 Emergency</a>
+</div>
+
 <main class="main-content">
-  <div class="container" style="max-width:900px">
+  <div class="container" style="max-width:980px">
 
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#B71C1C,#C62828);border-radius:var(--radius-lg);padding:var(--space-8);color:white;margin-bottom:var(--space-6);text-align:center">
-      <div style="font-size:56px;margin-bottom:12px">🚨</div>
-      <h1 style="color:white;font-size:var(--text-3xl);margin-bottom:8px" data-t="emergency_title">Emergency Information</h1>
-      <p style="color:rgba(255,255,255,0.85)" data-t="emergency_subtitle">Verified emergency contacts and safety information</p>
-      <div style="margin-top:16px;background:rgba(255,255,255,0.1);border-radius:var(--radius);padding:10px;font-size:var(--text-xs)">
-        ✅ All contact numbers on this page are verified official Indian government helplines.
-      </div>
-    </div>
-
-    <!-- Primary Emergency Numbers -->
-    <h2 style="margin-bottom:var(--space-4)">📞 Emergency Helplines</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4);margin-bottom:var(--space-8)">
-      ${MS_CONFIG ? '' : ''}
-    </div>
-    <div id="emergency-numbers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4);margin-bottom:var(--space-8)">
-      <!-- Rendered by JS -->
-    </div>
-
-    <!-- Disaster Preparedness -->
-    <h2 style="margin-bottom:var(--space-4)">🛡️ Disaster Preparedness Guide</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5);margin-bottom:var(--space-8)" id="prep-guides">
-      <!-- Rendered by JS -->
-    </div>
-
-    <!-- Emergency Kit -->
-    <div class="card" style="margin-bottom:var(--space-8)">
-      <div class="card-header">
-        <div class="card-title">🎒 Emergency Kit Checklist</div>
-      </div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-          ${[
-            ['💧','Water (3-day supply)'],['🍱','Non-perishable food'],
-            ['🔦','Flashlight + batteries'],['📻','Battery-powered radio'],
-            ['🩺','First aid kit'],['💊','Prescription medicines'],
-            ['📄','Important documents'],['💰','Cash (small bills)'],
-            ['🔋','Power bank / charger'],['🗺️','Local map'],
-            ['🧥','Warm clothing'],['🪣','Bucket / containers'],
-          ].map(([i,t]) => `
-            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--gray-50);border-radius:var(--radius);font-size:var(--text-sm)">
-              <span>${i}</span><span>${t}</span>
-            </div>`).join('')}
+    <!-- Header Banner -->
+    <div style="background:linear-gradient(135deg,#991B1B,#DC2626);border-radius:var(--radius-xl);padding:36px 32px;color:white;margin-bottom:var(--space-8);box-shadow:0 12px 28px -6px rgba(220,38,38,0.35);position:relative;overflow:hidden">
+      <div style="position:relative;z-index:2">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.18);padding:5px 14px;border-radius:var(--radius-full);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px">
+          <span>🚨</span> National Emergency Grid
+        </div>
+        <h1 style="color:white;font-size:2rem;font-weight:800;margin-bottom:8px">Emergency Operations & Helplines</h1>
+        <p style="color:rgba(255,255,255,0.9);font-size:15px;max-width:640px;line-height:1.6">
+          Immediate, verified government emergency contacts, disaster survival protocols, and checklist for severe weather crises across India.
+        </p>
+        <div style="margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="background:#FEF2F2;color:#991B1B;padding:6px 14px;border-radius:var(--radius-full);font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">
+            🛡️ Official IMD & NDMA Verified
+          </span>
+          <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:var(--radius-full);font-size:13px;font-weight:600">
+            📍 Immediate 24x7 Response
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Official Sources -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📡 Official Information Sources</div>
+    <!-- Primary Emergency Numbers -->
+    <div style="margin-bottom:var(--space-8)">
+      <div class="question-label" style="background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C;margin-bottom:12px">
+        <span>📞</span> Verified 24x7 Helplines
       </div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-        ${[
-          ['India Meteorological Department (IMD)', 'https://mausam.imd.gov.in', 'Official weather forecasts and warnings'],
-          ['National Disaster Management Authority', 'https://ndma.gov.in', 'Disaster management guidelines and alerts'],
-          ['Ministry of Earth Sciences', 'https://moes.gov.in', 'Earth science research and weather data'],
-          ['INCOIS', 'https://incois.gov.in', 'Ocean and coastal weather information'],
-          ['Doordarshan News', 'https://ddnews.gov.in', 'Official government news broadcasts'],
-        ].map(([name, url, desc]) => `
-          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius)">
-            <div style="flex:1">
-              <div style="font-weight:700;font-size:var(--text-sm)">${name}</div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted)">${desc}</div>
-            </div>
-            <a href="${url}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Visit →</a>
-          </div>`).join('')}
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:16px;color:var(--text-primary)">National & State Emergency Numbers</h2>
+      <div id="emergency-numbers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- Disaster Preparedness Guides -->
+    <div style="margin-bottom:var(--space-8)">
+      <div class="question-label" style="margin-bottom:12px">
+        <span>🛡️</span> Standard Operating Procedures
+      </div>
+      <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:16px;color:var(--text-primary)">Disaster Survival & Preparedness Guide</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px" id="prep-guides">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- Interactive Emergency Kit Checklist -->
+    <div class="card" style="margin-bottom:var(--space-8);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)">
+      <div class="card-header" style="background:#F8FAFC;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="card-title" style="font-size:1.15rem;font-weight:800;display:flex;align-items:center;gap:8px">
+            <span>🎒</span> Emergency Survival Kit Checklist
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:2px">Tap each item to mark it packed. Automatically saved to your device.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span id="kit-progress-label" style="background:var(--blue-50);color:var(--blue-700);padding:5px 12px;border-radius:var(--radius-full);font-size:13px;font-weight:700">0 / 12 Packed</span>
+          <button onclick="resetKitChecklist()" class="btn btn-ghost btn-sm" style="font-size:12px">Reset</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:24px">
+        <div id="kit-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+          <!-- Rendered dynamically by JS with interactive checkboxes -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Information Portals -->
+    <div class="card" style="margin-bottom:var(--space-10);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)">
+      <div class="card-header" style="background:#F8FAFC;padding:18px 24px">
+        <div class="card-title" style="font-size:1.15rem;font-weight:800;display:flex;align-items:center;gap:8px">
+          <span>📡</span> Official Government Portals & Early Warning Feeds
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:2px">Direct access to verified meteorological, disaster, and ocean warning centers.</p>
+      </div>
+      <div class="card-body" id="portals-container" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <!-- Rendered dynamically by JS -->
       </div>
     </div>
 
   </div>
 </main>
 
-<nav class="bottom-nav">
-  <div class="bottom-nav-items">
-    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">📊</span>Dashboard</a>
-    <a href="forecast.html" class="bottom-nav-item"><span class="nav-icon">📅</span>Forecast</a>
-    <a href="alerts.html" class="bottom-nav-item"><span class="nav-icon">⚠️</span>Alerts</a>
-    <a href="chat.html" class="bottom-nav-item"><span class="nav-icon">🤖</span>AI Chat</a>
-    <a href="emergency.html" class="bottom-nav-item active"><span class="nav-icon">🚨</span>Emergency</a>
-  </div>
-</nav>
-
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/location.js"></script>
 <script src="js/safety.js"></script>
+
 <script>
-LangManager.init();
+// ── Emergency Kit Data ──────────────────────────────────────
+const EMERGENCY_KIT_ITEMS = [
+  { id: 'water', icon: '💧', text: 'Water (3-day supply, 3L/person/day)' },
+  { id: 'food',  icon: '🍱', text: 'Non-perishable ready-to-eat food' },
+  { id: 'torch', icon: '🔦', text: 'High-power flashlight + spare batteries' },
+  { id: 'radio', icon: '📻', text: 'Battery-powered or hand-crank radio' },
+  { id: 'meds',  icon: '🩺', text: 'First-aid kit & emergency bandages' },
+  { id: 'rx',    icon: '💊', text: 'Prescription medicines (7-day supply)' },
+  { id: 'docs',  icon: '📄', text: 'Important documents in waterproof pouch' },
+  { id: 'cash',  icon: '💰', text: 'Cash in small bills (ATMs may shut down)' },
+  { id: 'power', icon: '🔋', text: 'Charged power bank & phone charging cable' },
+  { id: 'map',   icon: '🗺️', text: 'Local district offline evacuation map' },
+  { id: 'warm',  icon: '🧥', text: 'Warm clothing, rain poncho & sturdy shoes' },
+  { id: 'bucket',icon: '🪣', text: 'Multipurpose bucket, ropes & whistle' },
+];
 
-// Render emergency numbers
-document.getElementById('emergency-numbers').innerHTML = MS_CONFIG.EMERGENCY_NUMBERS.map(n => `
-  <div style="background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)">
-    <div style="width:52px;height:52px;background:#FFEBEE;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📞</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-weight:700;font-size:var(--text-base)">${n.name}</div>
-      <div style="font-size:var(--text-xs);color:var(--text-muted)">${n.org}</div>
+// ── Official Portals Data ───────────────────────────────────
+const OFFICIAL_PORTALS = [
+  {
+    name: 'India Meteorological Department (IMD)',
+    url: 'https://mausam.imd.gov.in',
+    desc: 'Official national weather forecasts, radar imagery, nowcasts, and severe weather warnings.',
+    badge: 'National Met Center'
+  },
+  {
+    name: 'National Disaster Management Authority (NDMA)',
+    url: 'https://ndma.gov.in',
+    desc: 'Statutory national disaster guidelines, active hazard advisories, and relief protocols.',
+    badge: 'Disaster Authority'
+  },
+  {
+    name: 'Ministry of Earth Sciences (MoES)',
+    url: 'https://moes.gov.in',
+    desc: 'Atmospheric research, monsoon mission observations, and geological hazard updates.',
+    badge: 'Govt. Ministry'
+  },
+  {
+    name: 'INCOIS (Ocean Information Services)',
+    url: 'https://incois.gov.in',
+    desc: 'High wave alerts, coastal tsunami warnings, and ocean weather forecasts for fishermen.',
+    badge: 'Coastal & Marine'
+  },
+  {
+    name: 'Doordarshan News Weather Bulletin',
+    url: 'https://ddnews.gov.in',
+    desc: 'Public broadcaster verified weather bulletins and state administration announcements.',
+    badge: 'Public Broadcast'
+  },
+];
+
+let currentLang = 'en';
+
+// ── User Menu Toggle ─────────────────────────────────────────
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+// ── Render Helplines ─────────────────────────────────────────
+function renderHelplines() {
+  const container = document.getElementById('emergency-numbers');
+  if (!container || !window.MS_CONFIG?.EMERGENCY_NUMBERS) return;
+
+  container.innerHTML = MS_CONFIG.EMERGENCY_NUMBERS.map(n => `
+    <div class="helpline-card">
+      <div style="width:48px;height:48px;background:#FEE2E2;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+        📞
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:15px;color:var(--text-primary)">${n.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${n.org}</div>
+      </div>
+      <a href="tel:${n.number}" class="btn btn-danger btn-sm" style="font-size:15px;font-weight:800;padding:8px 16px;border-radius:var(--radius-full);white-space:nowrap;text-decoration:none">
+        ${n.number}
+      </a>
     </div>
-    <a href="tel:${n.number}" class="btn btn-danger" style="font-size:var(--text-lg);font-weight:800;padding:10px 18px">${n.number}</a>
-  </div>
-`).join('');
+  `).join('');
+}
 
-// Preparedness guides
-const hazards = ['FLOOD','CYCLONE','HEATWAVE','LIGHTNING','HEAVY_RAIN','THUNDERSTORM'];
-document.getElementById('prep-guides').innerHTML = hazards.map(h => {
-  const adv = SafetyEngine.getAdvisory(h, LangManager.current);
-  return `
-    <div class="card">
-      <div class="card-header" style="padding:14px 16px">
-        <div class="card-title" style="font-size:var(--text-base)">${adv.icon} ${adv.title}</div>
+// ── Render Preparedness Guides ───────────────────────────────
+function renderPrepGuides() {
+  const container = document.getElementById('prep-guides');
+  if (!container) return;
+
+  const hazards = ['FLOOD','CYCLONE','HEATWAVE','LIGHTNING','HEAVY_RAIN','THUNDERSTORM'];
+  container.innerHTML = hazards.map(h => {
+    const adv = SafetyEngine.getAdvisory(h, currentLang);
+    return `
+      <div class="card" style="border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-xs)">
+        <div class="card-header" style="background:#F8FAFC;padding:14px 18px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">${adv.icon}</span>
+          <div class="card-title" style="font-size:15px;font-weight:800">${adv.title}</div>
+        </div>
+        <div class="card-body" style="padding:16px 18px">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
+            ${adv.tips.map(t => `
+              <li style="font-size:13px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px">
+                <span style="color:var(--blue-600);font-weight:700;line-height:1.2">•</span>
+                <span style="line-height:1.4">${t}</span>
+              </li>`).join('')}
+          </ul>
+          ${adv.emergency ? `
+            <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;font-size:12px">
+              <span style="font-weight:700;color:#DC2626">Emergency Line:</span>
+              <a href="tel:${adv.emergency}" style="font-weight:800;color:#DC2626;text-decoration:none">${adv.emergency}</a>
+            </div>` : ''}
+        </div>
       </div>
-      <div class="card-body" style="padding:14px 16px">
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
-          ${adv.tips.map(t => `<li style="font-size:var(--text-xs);color:var(--text-secondary);display:flex;gap:6px"><span style="color:var(--primary-500)">•</span><span>${t}</span></li>`).join('')}
-        </ul>
-        ${adv.emergency ? `<div style="margin-top:10px;font-size:var(--text-xs);font-weight:700;color:var(--warning-text)">📞 ${adv.emergency}</div>` : ''}
+    `;
+  }).join('');
+}
+
+// ── Interactive Emergency Kit ────────────────────────────────
+function getPackedItems() {
+  try {
+    return JSON.parse(localStorage.getItem('ms_kit_packed') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function savePackedItems(arr) {
+  localStorage.setItem('ms_kit_packed', JSON.stringify(arr));
+}
+
+function toggleKitItem(id) {
+  let packed = getPackedItems();
+  if (packed.includes(id)) {
+    packed = packed.filter(x => x !== id);
+  } else {
+    packed.push(id);
+  }
+  savePackedItems(packed);
+  renderKitChecklist();
+}
+
+function resetKitChecklist() {
+  savePackedItems([]);
+  renderKitChecklist();
+}
+
+function renderKitChecklist() {
+  const container = document.getElementById('kit-grid');
+  const label = document.getElementById('kit-progress-label');
+  if (!container) return;
+
+  const packed = getPackedItems();
+  if (label) label.textContent = `${packed.length} / ${EMERGENCY_KIT_ITEMS.length} Packed`;
+
+  container.innerHTML = EMERGENCY_KIT_ITEMS.map(item => {
+    const isChecked = packed.includes(item.id);
+    return `
+      <div class="kit-item-card ${isChecked ? 'checked' : ''}" onclick="toggleKitItem('${item.id}')">
+        <input type="checkbox" ${isChecked ? 'checked' : ''} style="width:18px;height:18px;accent-color:#16A34A;cursor:pointer" onclick="event.stopPropagation();toggleKitItem('${item.id}')">
+        <span style="font-size:20px">${item.icon}</span>
+        <span class="kit-text" style="font-size:13px;font-weight:600;flex:1">${item.text}</span>
       </div>
-    </div>`;
-}).join('');
+    `;
+  }).join('');
+}
+
+// ── Official Portals ─────────────────────────────────────────
+function renderOfficialPortals() {
+  const container = document.getElementById('portals-container');
+  if (!container) return;
+
+  container.innerHTML = OFFICIAL_PORTALS.map(p => `
+    <div class="source-portal-card">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <span style="font-weight:800;font-size:14.5px;color:var(--text-primary)">${p.name}</span>
+          <span style="background:var(--blue-50);color:var(--blue-700);font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--radius-full)">${p.badge}</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--text-muted);line-height:1.4">${p.desc}</div>
+      </div>
+      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size:12px;font-weight:700;white-space:nowrap">
+        Visit Portal →
+      </a>
+    </div>
+  `).join('');
+}
+
+// ── Language Toggle ──────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-hi').classList.toggle('active', lang === 'hi');
+  LangManager.setLanguage(lang);
+  renderPrepGuides();
+}
+
+// ── Initialize Page ──────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  LangManager.init();
+  AuthService.init();
+
+  // User details and navbar state handled automatically by AuthService.init()
+
+  // Location display
+  LocationService.init();
+  const loc = LocationService.current;
+  const locSub = document.getElementById('nav-location-sub');
+  if (locSub && loc) {
+    locSub.textContent = `${loc.city}${loc.state ? ', ' + loc.state : ''}`;
+  }
+
+  // Hamburger
+  const hamb = document.getElementById('hamburger-btn');
+  const menu = document.getElementById('mobile-menu');
+  if (hamb && menu) {
+    hamb.addEventListener('click', () => menu.classList.toggle('open'));
+  }
+
+  renderHelplines();
+  renderPrepGuides();
+  renderKitChecklist();
+  renderOfficialPortals();
+});
 </script>
 </body>
 </html>

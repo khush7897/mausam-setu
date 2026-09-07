@@ -15,18 +15,18 @@ const T = {
     simulation_label: 'SIMULATION',
 
     // Navigation
-    nav_home: 'Home',
-    nav_dashboard: 'Dashboard',
-    nav_forecast: 'Forecast',
-    nav_alerts: 'Alerts',
-    nav_chat: 'WeatherGPT',
-    nav_map: 'Map',
-    nav_farmer: 'Farmer Mode',
-    nav_fisherman: 'Fisherman Mode',
-    nav_emergency: 'Emergency',
-    nav_profile: 'Profile',
-    nav_admin: 'Admin',
-    nav_logout: 'Logout',
+    nav_home: '🏠 Home',
+    nav_dashboard: '📊 Dashboard',
+    nav_forecast: '📅 Forecast',
+    nav_alerts: '⚠️ Alerts',
+    nav_chat: '🤖 WeatherGPT',
+    nav_map: '🗺️ Map',
+    nav_farmer: '🌾 Farmer',
+    nav_fisherman: '⚓ Fisherman',
+    nav_emergency: '🚨 Emergency',
+    nav_profile: '👤 Profile & Settings',
+    nav_admin: '🛡️ Admin Dashboard',
+    nav_logout: '🚪 Logout',
 
     // Landing
     hero_title: 'Your Safety. Our Priority.',
@@ -54,6 +54,7 @@ const T = {
     role_fisherman: 'Fisherman',
     role_student: 'Student',
     role_official: 'Disaster Management Official',
+    admin_unauthorized: 'Access restricted: Administrator credentials required.',
 
     // Location
     location_title: 'Set Your Location',
@@ -228,18 +229,18 @@ const T = {
     simulation_label: 'सिमुलेशन',
 
     // Navigation
-    nav_home: 'होम',
-    nav_dashboard: 'डैशबोर्ड',
-    nav_forecast: 'पूर्वानुमान',
-    nav_alerts: 'अलर्ट',
-    nav_chat: 'मौसम GPT',
-    nav_map: 'नक्शा',
-    nav_farmer: 'किसान मोड',
-    nav_fisherman: 'मछुआरा मोड',
-    nav_emergency: 'आपातकाल',
-    nav_profile: 'प्रोफ़ाइल',
-    nav_admin: 'एडमिन',
-    nav_logout: 'लॉगआउट',
+    nav_home: '🏠 होम',
+    nav_dashboard: '📊 डैशबोर्ड',
+    nav_forecast: '📅 पूर्वानुमान',
+    nav_alerts: '⚠️ अलर्ट',
+    nav_chat: '🤖 वेदर GPT',
+    nav_map: '🗺️ नक्शा',
+    nav_farmer: '🌾 किसान',
+    nav_fisherman: '⚓ मछुआरा',
+    nav_emergency: '🚨 आपातकाल',
+    nav_profile: '👤 प्रोफाइल व सेटिंग्स',
+    nav_admin: '🛡️ एडमिन डैशबोर्ड',
+    nav_logout: '🚪 लॉगआउट',
 
     // Landing
     hero_title: 'आपकी सुरक्षा। हमारी प्राथमिकता।',
@@ -267,6 +268,7 @@ const T = {
     role_fisherman: 'मछुआरा',
     role_student: 'छात्र',
     role_official: 'आपदा प्रबंधन अधिकारी',
+    admin_unauthorized: 'पहुंच प्रतिबंधित: केवल प्रशासकों (Admin) के लिए अनुमत है।',
 
     // Location
     location_title: 'अपना स्थान सेट करें',
@@ -437,18 +439,53 @@ const LangManager = {
   current: 'en',
 
   init() {
-    const saved = localStorage.getItem(MS_CONFIG.STORAGE.LANG) || 'en';
+    const saved = localStorage.getItem(typeof MS_CONFIG !== 'undefined' ? MS_CONFIG.STORAGE.LANG : 'ms_lang') || 'en';
     this.setLanguage(saved, false);
+
+    // Automatically bind all language toggle buttons across the page
+    if (typeof document !== 'undefined' && !this._delegated) {
+      this._delegated = true;
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.lang-toggle-btn');
+        if (btn && btn.dataset && btn.dataset.lang) {
+          e.preventDefault();
+          this.setLanguage(btn.dataset.lang);
+        }
+      });
+    }
   },
 
   setLanguage(lang, save = true) {
     if (!T[lang]) lang = 'en';
     this.current = lang;
-    document.documentElement.lang = lang;
-    document.body.classList.toggle('lang-hi', lang === 'hi');
-    if (save) localStorage.setItem(MS_CONFIG.STORAGE.LANG, lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.body.classList.toggle('lang-hi', lang === 'hi');
+    }
+    if (save && typeof localStorage !== 'undefined') {
+      localStorage.setItem(typeof MS_CONFIG !== 'undefined' ? MS_CONFIG.STORAGE.LANG : 'ms_lang', lang);
+    }
     this.applyTranslations();
     this.updateToggles();
+
+    // Dispatch global language change event
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('ms:languagechange', { detail: { lang } }));
+
+      // Automatically notify known page re-render functions
+      try {
+        if (typeof window.onLanguageChange === 'function') window.onLanguageChange(lang);
+        if (typeof window.loadForecast === 'function') window.loadForecast();
+        if (typeof window.renderAlerts === 'function') window.renderAlerts();
+        if (typeof window.renderSafetyGrid === 'function') window.renderSafetyGrid();
+        if (typeof window.renderFarmerPage === 'function') window.renderFarmerPage();
+        if (typeof window.renderFishPage === 'function') window.renderFishPage();
+        if (typeof window.renderPrepGuides === 'function') window.renderPrepGuides();
+        if (typeof window.startNewChat === 'function' && document.getElementById('welcome-box')) window.startNewChat();
+      } catch (err) {
+        console.warn('Page re-render after language change error:', err);
+      }
+    }
   },
 
   t(key) {
@@ -456,6 +493,9 @@ const LangManager = {
   },
 
   applyTranslations() {
+    if (typeof document === 'undefined') return;
+
+    // Standard data-t attributes
     document.querySelectorAll('[data-t]').forEach(el => {
       const key = el.getAttribute('data-t');
       el.textContent = this.t(key);
@@ -469,12 +509,41 @@ const LangManager = {
     document.querySelectorAll('[data-t-aria]').forEach(el => {
       el.setAttribute('aria-label', this.t(el.getAttribute('data-t-aria')));
     });
+
+    // Translate Navigation Bar Links
+    const navMap = [
+      { href: 'dashboard.html', key: 'nav_dashboard' },
+      { href: 'forecast.html',  key: 'nav_forecast' },
+      { href: 'alerts.html',    key: 'nav_alerts', hasDot: true },
+      { href: 'chat.html',      key: 'nav_chat' },
+      { href: 'map.html',       key: 'nav_map' },
+      { href: 'farmer.html',    key: 'nav_farmer' },
+      { href: 'fisherman.html', key: 'nav_fisherman' },
+      { href: 'emergency.html', key: 'nav_emergency' },
+    ];
+
+    navMap.forEach(item => {
+      document.querySelectorAll(`a[href*="${item.href}"]`).forEach(link => {
+        if (link.classList.contains('nav-link') || link.classList.contains('bottom-nav-item')) {
+          if (item.hasDot) {
+            const dot = link.querySelector('#alerts-badge-dot');
+            const dotClass = dot ? dot.className : '';
+            const dotDisplay = dot ? dot.style.display : '';
+            link.innerHTML = `${this.t(item.key)} <span class="${dotClass}" id="alerts-badge-dot" style="${dotDisplay}"></span>`;
+          } else {
+            link.textContent = this.t(item.key);
+          }
+        }
+      });
+    });
   },
 
   updateToggles() {
+    if (typeof document === 'undefined') return;
     document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-      btn.setAttribute('aria-pressed', btn.dataset.lang === this.current);
-      btn.classList.toggle('active', btn.dataset.lang === this.current);
+      const isCurrent = btn.dataset.lang === this.current;
+      btn.setAttribute('aria-pressed', isCurrent);
+      btn.classList.toggle('active', isCurrent);
     });
   },
 
@@ -482,6 +551,12 @@ const LangManager = {
     this.setLanguage(this.current === 'en' ? 'hi' : 'en');
   }
 };
+
+// Global shorthand functions for easy invocation from inline handlers or scripts
+if (typeof window !== 'undefined') {
+  window.setLang = function(lang) { LangManager.setLanguage(lang); };
+  window.setChatLang = function(lang) { LangManager.setLanguage(lang); };
+}
 
 window.T = T;
 window.LangManager = LangManager;

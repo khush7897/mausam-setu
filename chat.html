@@ -45,21 +45,29 @@
 </head>
 <body style="overflow:hidden;background:#F8FAFC">
 
-<!-- Top Navigation -->
+<!-- Top Navigation (Matching Image 1) -->
 <nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
     <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
-      <span class="nav-brand-name">Mausam<span>Setu</span></span>
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Mausam Setu</span>
+        <span class="nav-brand-sub" id="nav-location-sub">Raipur, Chhattisgarh</span>
+      </div>
     </a>
 
     <div class="nav-links" role="menubar">
-      <a href="index.html" class="nav-link" role="menuitem">Home</a>
-      <a href="chat.html" class="nav-link active" role="menuitem">WeatherGPT</a>
-      <a href="forecast.html" class="nav-link" role="menuitem">Forecast</a>
-      <a href="map.html" class="nav-link" role="menuitem">Weather Maps</a>
-      <a href="alerts.html" class="nav-link" role="menuitem">Severe Alerts</a>
-      <a href="dashboard.html" class="nav-link" role="menuitem">Climate</a>
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link active" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link" role="menuitem">🚨 Emergency</a>
     </div>
 
     <div class="nav-actions">
@@ -67,7 +75,18 @@
         <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setChatLang('en')">EN</button>
         <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setChatLang('hi')">हिं</button>
       </div>
-      <a href="login.html" class="btn btn-primary btn-sm" id="nav-sign-in">Sign In</a>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
       <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
@@ -75,18 +94,17 @@
 
 <!-- Mobile Menu -->
 <div class="nav-mobile-menu" id="mobile-menu" role="navigation">
-  <a href="index.html" class="nav-link">Home</a>
-  <a href="chat.html" class="nav-link active">🤖 WeatherGPT</a>
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
   <a href="forecast.html" class="nav-link">📅 Forecast</a>
-  <a href="map.html" class="nav-link">🗺️ Weather Maps</a>
-  <a href="alerts.html" class="nav-link">⚠️ Severe Alerts</a>
-  <a href="dashboard.html" class="nav-link">📈 Climate / Dashboard</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link active">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link">🗺️ Map</a>
   <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
   <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
-  <a href="login.html" class="btn btn-primary btn-full" style="margin-top:8px;border-radius:var(--radius-md)">Sign In / Register</a>
+  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
 </div>
 
-<!-- WeatherGPT App Layout (Screen 2 Reference) -->
+<!-- WeatherGPT App Layout -->
 <div class="weathergpt-app" style="margin-top:var(--nav-height)">
 
   <!-- Left Sidebar -->
@@ -128,7 +146,7 @@
         <span class="status-dot-pulse"></span>
         <span>IMD Live Grid</span>
       </div>
-      <button onclick="clearChatHistory()" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;color:var(--text-muted)" title="Clear conversation">
+      <button onclick="confirmClearChat()" class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:11px;color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-full);background:white;cursor:pointer" title="Clear conversation history">
         🗑️ Clear
       </button>
     </div>
@@ -137,32 +155,65 @@
   <!-- Main Chat Panel -->
   <main class="weathergpt-main-panel">
 
-    <!-- Top Sub-Header -->
+    <!-- Top Sub-Header Bar (Matching Image 1 Design System) -->
     <div class="weathergpt-panel-header">
       <div class="panel-header-left">
-        <button class="sidebar-toggle-btn btn btn-ghost btn-sm" onclick="toggleSidebar()" style="display:none;padding:6px;font-size:18px">
+        <button class="sidebar-toggle-btn btn btn-ghost btn-sm" onclick="toggleSidebar()" style="display:none;padding:6px;font-size:18px" aria-label="Toggle Sidebar">
           ☰
         </button>
-        <div class="gpt-sparkle-logo">✨</div>
-        <div class="gpt-title">
-          <span>WeatherGPT</span>
-          <span class="gpt-engine-tag">IMD Weather Intelligence v2.5</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="gpt-sparkle-logo">✨</div>
+          <div class="gpt-title">
+            <span>WeatherGPT</span>
+            <span class="gpt-engine-tag">IMD Weather Intelligence v2.5</span>
+          </div>
+        </div>
+
+        <!-- Location Group (Matching Image 1) -->
+        <div class="dash-location-group">
+          <div class="question-label" style="margin-bottom:0"><span>📍</span> Current Location</div>
+          <div id="location-display" class="location-display" onclick="showLocationModal()" title="Click to change location">
+            <span class="location-name-bold" id="location-text">Raipur, Chhattisgarh</span>
+            <span class="location-change-chip">Change ✏️</span>
+          </div>
         </div>
       </div>
 
-      <div class="panel-header-right">
-        <div class="loc-badge-btn" id="active-location-badge">
-          <span>📍</span> <span id="loc-text">New Delhi, India</span>
+      <!-- Status Group (Matching Image 1) -->
+      <div class="dash-status-group">
+        <div class="source-strip">
+          <span class="live-pulse-dot"></span>
+          <span id="data-source-label">Source: IMD Live Observations</span>
         </div>
-        <button onclick="startNewChat()" class="btn btn-ghost btn-sm" style="font-size:12px">
-          🔄 New
+        <div class="update-pill" id="last-updated-label">Updated: 12:35 am</div>
+        <button class="btn btn-ghost btn-sm clear-chat-header-btn" onclick="confirmClearChat()" style="padding:5px 12px;font-size:12px;font-weight:600;color:var(--text-secondary);border:1.5px solid var(--border);border-radius:var(--radius-full);background:white;display:inline-flex;align-items:center;gap:5px;cursor:pointer" title="Clear chat history">
+          <span>🗑️</span>
+          <span id="label-header-clear-chat">Clear History</span>
         </button>
+        <button class="dash-refresh-btn" onclick="refreshWeatherContext()" title="Refresh Live Weather Telemetry">🔄</button>
       </div>
     </div>
 
     <!-- Messages Scroll Area -->
     <div class="weathergpt-scroll-area" id="chat-scroll">
       <div class="weathergpt-content-wrap" id="chat-stream">
+
+        <!-- Active Hazard Advisory Banner (Matching Image 1) -->
+        <div id="alert-banner-section" style="margin-bottom:12px">
+          <div class="question-label" style="background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C"><span>🚨</span> Active Hazard Advisory</div>
+          <div id="alert-banner">
+            <div class="active-alert-banner warning" onclick="askPrompt('Tell me about the active Cyclone Watch in Bay of Bengal and safety instructions')"
+                 style="background:rgba(239, 68, 68, 0.08);border-color:#FCA5A5;border-left-color:#DC2626">
+              <div class="banner-icon">🌀</div>
+              <div class="banner-content">
+                <div class="banner-label" style="color:#DC2626">WARNING · SIMULATION</div>
+                <div class="banner-title" style="color:#7F1D1D;font-weight:700">Cyclone Watch — Bay of Bengal</div>
+                <div class="banner-area" style="color:#7F1D1D;opacity:0.8">📍 Coastal Andhra Pradesh & Odisha · Deep depression moving NNW</div>
+              </div>
+              <div class="banner-action" style="color:#DC2626">View Details →</div>
+            </div>
+          </div>
+        </div>
 
         <!-- Welcome Banner (Screen 2 Initial State) -->
         <div class="weathergpt-welcome-box" id="welcome-box">
@@ -173,21 +224,25 @@
           </p>
 
           <div class="welcome-prompts-grid">
-            <div class="prompt-card-chip" onclick="askPrompt('Will it rain in Delhi today?')">
+            <div class="prompt-card-chip" onclick="askPrompt('Will it rain in Raipur today?')">
               <span class="chip-icon">🌧️</span>
-              <span>Will it rain in Delhi today?</span>
+              <span>Will it rain in Raipur today?</span>
+              <span class="chip-arrow">➔</span>
             </div>
             <div class="prompt-card-chip" onclick="askPrompt('Crop spraying advisory for wheat')">
               <span class="chip-icon">🌾</span>
               <span>Crop spraying advisory for wheat</span>
+              <span class="chip-arrow">➔</span>
             </div>
             <div class="prompt-card-chip" onclick="askPrompt('Check active flood and cyclone warnings')">
               <span class="chip-icon">⚠️</span>
               <span>Check active flood & cyclone warnings</span>
+              <span class="chip-arrow">➔</span>
             </div>
-            <div class="prompt-card-chip" onclick="askPrompt('Travel weather forecast Delhi to Jaipur')">
+            <div class="prompt-card-chip" onclick="askPrompt('Travel weather: Raipur to Nagpur')">
               <span class="chip-icon">🚗</span>
-              <span>Travel weather: Delhi to Jaipur</span>
+              <span>Travel weather: Raipur to Nagpur</span>
+              <span class="chip-arrow">➔</span>
             </div>
           </div>
         </div>
@@ -226,6 +281,65 @@
 
 </div>
 
+<!-- Location Modal (Matching Dashboard) -->
+<div class="modal-overlay" id="location-modal" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📍 Set Your Location</div>
+      <button class="modal-close" onclick="Utils.hideModal('location-modal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:20px;font-size:var(--text-sm);color:var(--text-muted)">Choose how you want to set your location for accurate weather and alerts.</p>
+      <button class="btn btn-primary btn-full btn-lg" onclick="requestGPS()" id="gps-btn" style="margin-bottom:12px">
+        📍 Use My Current GPS Location
+      </button>
+      <div class="form-divider">or enter manually</div>
+      <div class="form-group">
+        <label class="form-label" for="manual-city">City / Village</label>
+        <input type="text" id="manual-city" class="form-input" placeholder="e.g. Raipur, Mumbai, Patna, Jaipur" oninput="searchCities(this.value)">
+        <div id="city-suggestions" style="margin-top:4px;display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label" for="manual-district">District</label>
+          <input type="text" id="manual-district" class="form-input" placeholder="District">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="manual-state">State</label>
+          <select id="manual-state" class="form-input form-select">
+            <option value="">Select...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Utils.hideModal('location-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmManualLocation()" id="confirm-loc-btn">Confirm Location</button>
+    </div>
+  </div>
+</div>
+
+<!-- Clear Chat Confirmation Modal -->
+<div id="clear-chat-modal" class="modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.65);z-index:10000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)">
+  <div class="modal-card" style="background:#FFFFFF;border-radius:20px;max-width:420px;width:100%;padding:28px 24px;box-shadow:0 25px 60px -12px rgba(15,23,42,0.3);text-align:center;border:1.5px solid var(--border)">
+    <div style="width:56px;height:56px;background:#FEE2E2;border:1.5px solid #FCA5A5;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px">
+      🗑️
+    </div>
+    <h3 style="font-size:1.25rem;font-weight:800;color:#0F172A;margin:0 0 8px 0" id="clear-modal-title">Clear Chat History?</h3>
+    <p style="font-size:13.5px;color:#475569;margin:0 0 24px 0;line-height:1.55;font-weight:500" id="clear-modal-desc">
+      All saved conversation messages will be permanently removed. This action cannot be undone.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <button type="button" class="btn btn-ghost" onclick="closeClearModal()" style="border:1.5px solid #CBD5E1;font-weight:700;font-size:13.5px;border-radius:12px;color:#334155;background:#F8FAFC">
+        Cancel
+      </button>
+      <button type="button" class="btn" onclick="executeClearChat()" style="background:#DC2626;color:#FFFFFF;font-weight:700;font-size:13.5px;border-radius:12px;border:none;box-shadow:0 4px 14px rgba(220,38,38,0.28)">
+        Yes, Clear All
+      </button>
+    </div>
+  </div>
+</div>
+
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
@@ -242,19 +356,239 @@ let currentLang = 'en';
 let recognition = null;
 let isRecording = false;
 
-// Initialize
+// ── User Menu ───────────────────────────────────────────────
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+function updateUserNavUI() {
+  if (typeof AuthService !== 'undefined' && AuthService.updateNav) {
+    AuthService.updateNav();
+  }
+}
+
+// ── Location Modal & Sync ────────────────────────────────────
+function showLocationModal() {
+  Utils.showModal('location-modal');
+  const stateSelect = document.getElementById('manual-state');
+  if (stateSelect && stateSelect.options.length <= 1 && window.MS_CONFIG?.STATES) {
+    MS_CONFIG.STATES.forEach(st => {
+      const opt = document.createElement('option');
+      opt.value = st;
+      opt.textContent = st;
+      stateSelect.appendChild(opt);
+    });
+  }
+}
+
+async function requestGPS() {
+  const btn = document.getElementById('gps-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Detecting location...';
+  }
+  try {
+    const loc = await LocationService.getGPS();
+    Utils.hideModal('location-modal');
+    Utils.showToast('Location updated: ' + loc.city, 'success');
+    updateLocationUI(loc);
+    await WeatherGPT.loadContext();
+  } catch {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '📍 Use My Current GPS Location';
+    }
+    Utils.showToast('GPS unavailable. Please enter manually.', 'warning');
+  }
+}
+
+function searchCities(val) {
+  const cities = ['Raipur','Mumbai','Delhi','Chennai','Kolkata','Bangalore','Hyderabad','Jaipur','Bhubaneswar','Patna','Ahmedabad','Surat','Pune','Lucknow','Nagpur','Visakhapatnam'];
+  const suggestions = document.getElementById('city-suggestions');
+  if (!suggestions) return;
+  if (val.length < 2) { suggestions.innerHTML = ''; return; }
+  const matches = cities.filter(c => c.toLowerCase().startsWith(val.toLowerCase())).slice(0,4);
+  suggestions.innerHTML = matches.map(c => `
+    <div onclick="selectCity('${c}')" style="padding:8px 12px;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:var(--text-sm)">${c}</div>
+  `).join('');
+}
+
+function selectCity(city) {
+  document.getElementById('manual-city').value = city;
+  document.getElementById('city-suggestions').innerHTML = '';
+}
+
+async function confirmManualLocation() {
+  const city = document.getElementById('manual-city').value.trim();
+  const district = document.getElementById('manual-district').value.trim();
+  const state = document.getElementById('manual-state').value;
+  if (!city) { Utils.showToast('Please enter a city name.', 'warning'); return; }
+  const loc = LocationService.setManual(city, district, state);
+  Utils.hideModal('location-modal');
+  Utils.showToast('Location updated to ' + city, 'success');
+  updateLocationUI(loc);
+  await WeatherGPT.loadContext();
+}
+
+function updateLocationUI(loc) {
+  if (!loc) return;
+  const str = `${loc.city}${loc.state ? ', ' + loc.state : ''}`;
+  const locText = document.getElementById('location-text');
+  if (locText) locText.textContent = str;
+  const locSub = document.getElementById('nav-location-sub');
+  if (locSub) locSub.textContent = str;
+  const now = new Date();
+  const updateEl = document.getElementById('last-updated-label');
+  if (updateEl) updateEl.textContent = `Updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+}
+
+// ── Chat Storage Service (Local & Server Database Persistence) ─
+const ChatStorage = {
+  getUserId() {
+    const user = (typeof AuthService !== 'undefined' && AuthService.getUser) ? AuthService.getUser() : null;
+    return user?.id || user?.mobile || 'guest';
+  },
+
+  getStorageKey() {
+    const base = (window.MS_CONFIG?.STORAGE?.CHAT_HISTORY || 'ms_chat_history');
+    return `${base}_${this.getUserId()}`;
+  },
+
+  loadLocal() {
+    if (typeof Utils !== 'undefined') {
+      return Utils.retrieve(this.getStorageKey(), []);
+    }
+    try {
+      const v = localStorage.getItem(this.getStorageKey());
+      return v ? JSON.parse(v) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  saveLocal(messages) {
+    if (typeof Utils !== 'undefined') {
+      Utils.store(this.getStorageKey(), messages);
+    } else {
+      try { localStorage.setItem(this.getStorageKey(), JSON.stringify(messages)); } catch {}
+    }
+  },
+
+  async syncWithServer() {
+    try {
+      const uid = this.getUserId();
+      const res = await fetch(`/api/ai/history?userId=${encodeURIComponent(uid)}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.history) && data.history.length > 0) {
+        const local = this.loadLocal();
+        if (!local || local.length === 0) {
+          const transformed = data.history.map(item => ({
+            id: 'srv_' + item.id,
+            sender: item.sender,
+            text: item.message,
+            html: item.raw_response ? (typeof WeatherGPT !== 'undefined' ? WeatherGPT.formatMessage(item.raw_response) : item.raw_response) : item.message,
+            timeStr: new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: new Date(item.created_at).getTime(),
+            city: item.city
+          }));
+          this.saveLocal(transformed);
+          return transformed;
+        }
+      }
+    } catch (e) {
+      console.warn('Server chat history sync skipped:', e);
+    }
+    return this.loadLocal();
+  },
+
+  appendMessage(msg) {
+    const current = this.loadLocal();
+    current.push(msg);
+    this.saveLocal(current);
+
+    // Asynchronously send to server for permanent SQLite storage
+    try {
+      fetch('/api/ai/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: this.getUserId(),
+          sessionId: 'default',
+          sender: msg.sender,
+          message: msg.text,
+          rawResponse: msg.rawResponse || msg.text,
+          city: msg.city || LocationService?.current?.city || 'India'
+        })
+      }).catch(() => {});
+    } catch {}
+  },
+
+  async clearAll() {
+    if (typeof Utils !== 'undefined') {
+      Utils.remove(this.getStorageKey());
+    } else {
+      localStorage.removeItem(this.getStorageKey());
+    }
+
+    try {
+      await fetch('/api/ai/history', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: this.getUserId() })
+      });
+    } catch (e) {
+      console.warn('Backend clear history error:', e);
+    }
+  },
+
+  deleteSingleQuery(queryText) {
+    const current = this.loadLocal();
+    const cleanQ = (queryText || '').trim().toLowerCase();
+    const filtered = [];
+    let skipBot = false;
+    for (const m of current) {
+      if (m.sender === 'user' && m.text.trim().toLowerCase() === cleanQ) {
+        skipBot = true;
+        continue;
+      }
+      if (skipBot && m.sender === 'bot') {
+        skipBot = false;
+        continue;
+      }
+      skipBot = false;
+      filtered.push(m);
+    }
+    this.saveLocal(filtered);
+  }
+};
+
+// ── Initialize ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   LangManager.init();
   AuthService.init();
   AlertService.init();
+  updateUserNavUI();
 
-  // Load location & weather context
-  await WeatherGPT.loadContext();
-  const loc = WeatherGPT._location;
-  if (loc?.city) {
-    const locText = document.getElementById('loc-text');
-    if (locText) locText.textContent = loc.city + (loc.state ? ', ' + loc.state : '');
+  // Load / default location (Raipur, Chhattisgarh if not set)
+  LocationService.init();
+  let loc = LocationService.current;
+  if (!loc) {
+    loc = LocationService.setManual('Raipur', 'Raipur', 'Chhattisgarh', 21.2514, 81.6296);
   }
+  updateLocationUI(loc);
+
+  // Load WeatherGPT context
+  await WeatherGPT.loadContext();
+
+  // Sync and render persistent chat messages
+  await ChatStorage.syncWithServer();
+  renderChatHistory();
 
   // Hamburger toggle
   const hamb = document.getElementById('hamburger-btn');
@@ -281,13 +615,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       submitMessage();
     };
 
-    recognition.onerror = () => {
-      stopVoice();
-    };
-
-    recognition.onend = () => {
-      stopVoice();
-    };
+    recognition.onerror = () => { stopVoice(); };
+    recognition.onend = () => { stopVoice(); };
   }
 });
 
@@ -305,6 +634,14 @@ function setChatLang(lang) {
       ? 'WeatherGPT से मौसम, बारिश, अलर्ट या खेती के बारे में पूछें...' 
       : 'Ask WeatherGPT about rain, temperature, farming, alerts...';
   }
+  const clearBtn = document.getElementById('label-header-clear-chat');
+  if (clearBtn) {
+    clearBtn.textContent = lang === 'hi' ? 'चैट मिटाएं' : 'Clear History';
+  }
+  const welcome = document.getElementById('welcome-box');
+  if (welcome) {
+    appendWelcomeBox();
+  }
 }
 
 function toggleSidebar() {
@@ -312,41 +649,242 @@ function toggleSidebar() {
   if (sidebar) sidebar.classList.toggle('mobile-open');
 }
 
-function startNewChat() {
+// ── Render Full Stored Chat Stream ───────────────────────────
+function renderChatHistory() {
+  const messages = ChatStorage.loadLocal();
   const stream = document.getElementById('chat-stream');
-  stream.innerHTML = `
-    <div class="weathergpt-welcome-box" id="welcome-box">
-      <div class="welcome-sparkle-hero">✨</div>
-      <h2 class="welcome-title">WeatherGPT</h2>
-      <p class="welcome-desc">
-        ${currentLang === 'hi'
-          ? 'आपका AI मौसम साथी — रीयल-टाइम IMD पूर्वानुमान, प्रारंभिक आपदा चेतावनी और कृषि सलाह।'
-          : 'Your intelligent Indian weather companion powered by real-time IMD forecasts, early disaster warnings, and agricultural advisories.'}
-      </p>
-      <div class="welcome-prompts-grid">
-        <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'क्या आज दिल्ली में बारिश होगी?' : 'Will it rain in Delhi today?'}')">
-          <span class="chip-icon">🌧️</span>
-          <span>${currentLang === 'hi' ? 'क्या आज दिल्ली में बारिश होगी?' : 'Will it rain in Delhi today?'}</span>
+  if (!stream) return;
+
+  const banner = document.getElementById('alert-banner-section');
+  stream.innerHTML = '';
+  if (banner) stream.appendChild(banner);
+
+  if (!messages || messages.length === 0) {
+    appendWelcomeBox();
+    renderRecentChatsSidebar([]);
+    return;
+  }
+
+  // Restore badge indicator
+  const restoredPill = document.createElement('div');
+  restoredPill.id = 'chat-restored-pill';
+  restoredPill.style.textAlign = 'center';
+  restoredPill.style.margin = '4px 0 16px';
+  restoredPill.innerHTML = `
+    <span style="font-size:11px;font-weight:700;color:var(--text-muted);background:#FFFFFF;border:1px solid var(--border);padding:4px 14px;border-radius:var(--radius-full);letter-spacing:0.04em;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-xs)">
+      <span>💾</span>
+      <span>${currentLang === 'hi' ? 'सहेजा गया चैट इतिहास सुरक्षित है' : 'Saved Conversation History Restored'} (${messages.length} ${currentLang === 'hi' ? 'संदेश' : 'messages'})</span>
+    </span>
+  `;
+  stream.appendChild(restoredPill);
+
+  messages.forEach(m => {
+    if (m.sender === 'user') {
+      const row = document.createElement('div');
+      row.className = 'gpt-msg-row user';
+      row.innerHTML = `
+        <div class="gpt-user-bubble">
+          <div>${escHTML(m.text)}</div>
+          <div class="gpt-msg-time" style="font-size:10.5px;opacity:0.8;text-align:right;margin-top:4px">${m.timeStr || ''}</div>
         </div>
-        <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'गेहूं के लिए कीटनाशक छिड़काव सलाह' : 'Crop spraying advisory for wheat'}')">
-          <span class="chip-icon">🌾</span>
-          <span>${currentLang === 'hi' ? 'गेहूं के लिए कीटनाशक छिड़काव सलाह' : 'Crop spraying advisory for wheat'}</span>
+      `;
+      stream.appendChild(row);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'gpt-msg-row bot';
+      row.innerHTML = `
+        <div class="gpt-bot-avatar">✨</div>
+        <div class="gpt-bot-card">
+          ${m.html || (typeof WeatherGPT !== 'undefined' ? WeatherGPT.formatMessage(m.text) : m.text)}
+          <div class="gpt-msg-time" style="font-size:10.5px;color:var(--text-dim);margin-top:8px;text-align:right">${m.timeStr || ''}</div>
         </div>
-        <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'सक्रिय बाढ़ और चक्रवात चेतावनी देखें' : 'Check active flood and cyclone warnings'}')">
-          <span class="chip-icon">⚠️</span>
-          <span>${currentLang === 'hi' ? 'सक्रिय बाढ़ और चक्रवात चेतावनी देखें' : 'Check active flood & cyclone warnings'}</span>
-        </div>
-        <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'दिल्ली से जयपुर यात्रा मौसम' : 'Travel weather forecast Delhi to Jaipur'}')">
-          <span class="chip-icon">🚗</span>
-          <span>${currentLang === 'hi' ? 'दिल्ली से जयपुर यात्रा मौसम' : 'Travel weather: Delhi to Jaipur'}</span>
-        </div>
+      `;
+      stream.appendChild(row);
+    }
+  });
+
+  scrollBottom();
+  renderRecentChatsSidebar(messages);
+}
+
+// ── Welcome Box Generator ───────────────────────────────────
+function appendWelcomeBox() {
+  const stream = document.getElementById('chat-stream');
+  if (!stream) return;
+  const existing = document.getElementById('welcome-box');
+  if (existing) existing.remove();
+
+  const city = LocationService?.current?.city || 'Raipur';
+  const box = document.createElement('div');
+  box.className = 'weathergpt-welcome-box';
+  box.id = 'welcome-box';
+  box.innerHTML = `
+    <div class="welcome-sparkle-hero">✨</div>
+    <h2 class="welcome-title">WeatherGPT</h2>
+    <p class="welcome-desc">
+      ${currentLang === 'hi'
+        ? 'आपका AI मौसम साथी — रीयल-टाइम IMD पूर्वानुमान, प्रारंभिक आपदा चेतावनी और कृषि सलाह।'
+        : 'Your intelligent Indian weather companion powered by real-time IMD forecasts, early disaster warnings, and agricultural advisories.'}
+    </p>
+    <div class="welcome-prompts-grid">
+      <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? `क्या आज ${city} में बारिश होगी?` : `Will it rain in ${city} today?`}')">
+        <span class="chip-icon">🌧️</span>
+        <span>${currentLang === 'hi' ? `क्या आज ${city} में बारिश होगी?` : `Will it rain in ${city} today?`}</span>
+        <span class="chip-arrow">➔</span>
+      </div>
+      <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'गेहूं के लिए कीटनाशक छिड़काव सलाह' : 'Crop spraying advisory for wheat'}')">
+        <span class="chip-icon">🌾</span>
+        <span>${currentLang === 'hi' ? 'गेहूं के लिए कीटनाशक छिड़काव सलाह' : 'Crop spraying advisory for wheat'}</span>
+        <span class="chip-arrow">➔</span>
+      </div>
+      <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? 'सक्रिय बाढ़ और चक्रवात चेतावनी देखें' : 'Check active flood and cyclone warnings'}')">
+        <span class="chip-icon">⚠️</span>
+        <span>${currentLang === 'hi' ? 'सक्रिय बाढ़ और चक्रवात चेतावनी देखें' : 'Check active flood & cyclone warnings'}</span>
+        <span class="chip-arrow">➔</span>
+      </div>
+      <div class="prompt-card-chip" onclick="askPrompt('${currentLang === 'hi' ? `${city} से निकटतम शहर यात्रा मौसम` : `Travel weather: ${city} to Nagpur`}')">
+        <span class="chip-icon">🚗</span>
+        <span>${currentLang === 'hi' ? `${city} से निकटतम शहर यात्रा मौसम` : `Travel weather: ${city} to Nagpur`}</span>
+        <span class="chip-arrow">➔</span>
       </div>
     </div>
   `;
+  stream.appendChild(box);
 }
 
-function clearChatHistory() {
-  startNewChat();
+// ── Render Sidebar Recent Chats ──────────────────────────────
+function renderRecentChatsSidebar(messages) {
+  const container = document.getElementById('recent-chats-container');
+  if (!container) return;
+
+  const userQueries = [];
+  const seen = new Set();
+  if (messages && messages.length > 0) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m.sender === 'user' && m.text && !seen.has(m.text.trim().toLowerCase())) {
+        seen.add(m.text.trim().toLowerCase());
+        userQueries.push(m.text.trim());
+        if (userQueries.length >= 8) break;
+      }
+    }
+  }
+
+  if (userQueries.length === 0) {
+    container.innerHTML = `
+      <div class="recent-chat-item" onclick="askPrompt('Delhi air quality & AQI forecast')">
+        <span class="chat-icon">💬</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">Delhi AQI & Smog</span>
+      </div>
+      <div class="recent-chat-item" onclick="askPrompt('Monsoon update Mumbai')">
+        <span class="chat-icon">💬</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">Monsoon Timeline Mumbai</span>
+      </div>
+      <div class="recent-chat-item" onclick="askPrompt('Cyclone warning Bay of Bengal')">
+        <span class="chat-icon">💬</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">Bay of Bengal Cyclone</span>
+      </div>
+      <div class="recent-chat-item" onclick="askPrompt('Best time to sow wheat in Punjab')">
+        <span class="chat-icon">💬</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">Wheat Sowing Advisory</span>
+      </div>
+      <div class="recent-chat-item" onclick="askPrompt('Heavy rain alert Uttarakhand')">
+        <span class="chat-icon">💬</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">Uttarakhand Rain Alert</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = userQueries.map(q => `
+    <div class="recent-chat-item" style="display:flex;align-items:center;justify-content:space-between;gap:8px" onclick="askPrompt('${escHTML(q).replace(/'/g, "\\'")}')">
+      <span class="chat-icon">💬</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="${escHTML(q)}">${escHTML(q)}</span>
+      <button type="button" onclick="event.stopPropagation(); deleteQueryFromHistory('${escHTML(q).replace(/'/g, "\\'")}')" class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;color:var(--text-muted);border:none;background:none;cursor:pointer" title="Delete this conversation">✕</button>
+    </div>
+  `).join('');
+}
+
+// ── New Chat Action ──────────────────────────────────────────
+function startNewChat() {
+  const stream = document.getElementById('chat-stream');
+  if (!stream) return;
+  const messages = ChatStorage.loadLocal();
+  if (messages && messages.length > 0) {
+    const divider = document.createElement('div');
+    divider.style.textAlign = 'center';
+    divider.style.margin = '18px 0';
+    divider.innerHTML = `
+      <span style="font-size:11.5px;font-weight:700;color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-200);padding:4px 14px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:6px">
+        <span>✨</span>
+        <span>${currentLang === 'hi' ? 'नया संवाद सत्र प्रारंभ' : 'New Chat Session Started'}</span>
+      </span>
+    `;
+    stream.appendChild(divider);
+    scrollBottom();
+  }
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.focus();
+  }
+  Utils.showToast(currentLang === 'hi' ? 'नया सत्र प्रारंभ हुआ ✨' : 'New chat session started ✨', 'info');
+}
+
+// ── Clear Chat History Confirmation ─────────────────────────
+function confirmClearChat() {
+  const modal = document.getElementById('clear-chat-modal');
+  if (!modal) return;
+  const title = document.getElementById('clear-modal-title');
+  const desc = document.getElementById('clear-modal-desc');
+  if (title && desc) {
+    if (currentLang === 'hi') {
+      title.textContent = 'चैट इतिहास मिटाएं?';
+      desc.textContent = 'आपके सभी सहेजे गए संवाद संदेश हमेशा के लिए हटा दिए जाएंगे। क्या आप आगे बढ़ना चाहते हैं?';
+    } else {
+      title.textContent = 'Clear Chat History?';
+      desc.textContent = 'All stored messages in your conversation will be permanently deleted. This action cannot be undone.';
+    }
+  }
+  modal.style.display = 'flex';
+}
+
+function closeClearModal() {
+  const modal = document.getElementById('clear-chat-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function executeClearChat() {
+  closeClearModal();
+  await ChatStorage.clearAll();
+  renderChatHistory();
+  Utils.showToast(currentLang === 'hi' ? 'चैट इतिहास हटा दिया गया 🗑️' : 'Chat history cleared 🗑️', 'info');
+}
+
+function deleteQueryFromHistory(queryText) {
+  ChatStorage.deleteSingleQuery(queryText);
+  renderChatHistory();
+  Utils.showToast(currentLang === 'hi' ? 'चर्चा इतिहास से हटाई गई 🗑️' : 'Topic removed from history 🗑️', 'info');
+}
+
+// ── Telemetry Refresh ────────────────────────────────────────
+async function refreshWeatherContext() {
+  const btn = document.querySelector('.dash-refresh-btn');
+  if (btn) {
+    btn.style.transform = 'rotate(360deg)';
+    btn.style.transition = 'transform 0.5s ease';
+  }
+  Utils.showToast(currentLang === 'hi' ? 'मौसम टेलीमेट्री अपडेट हो रही है...' : 'Refreshing live weather telemetry...', 'info');
+  await WeatherGPT.loadContext();
+  const now = new Date();
+  const updateEl = document.getElementById('last-updated-label');
+  if (updateEl) updateEl.textContent = `Updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+  setTimeout(() => {
+    if (btn) {
+      btn.style.transform = 'none';
+      btn.style.transition = 'none';
+    }
+    Utils.showToast(currentLang === 'hi' ? 'डेटा सफलतापूर्वक अपडेट हुआ ✅' : 'Live telemetry synchronized ✅', 'success');
+  }, 600);
 }
 
 function askPrompt(text) {
@@ -401,7 +939,7 @@ function stopVoice() {
   if (btn) btn.classList.remove('listening');
 }
 
-function addUserMessage(text) {
+function addUserMessage(text, timeStr = '') {
   const welcome = document.getElementById('welcome-box');
   if (welcome) welcome.remove();
 
@@ -409,13 +947,16 @@ function addUserMessage(text) {
   const row = document.createElement('div');
   row.className = 'gpt-msg-row user';
   row.innerHTML = `
-    <div class="gpt-user-bubble">${escHTML(text)}</div>
+    <div class="gpt-user-bubble">
+      <div>${escHTML(text)}</div>
+      ${timeStr ? `<div class="gpt-msg-time" style="font-size:10.5px;opacity:0.8;text-align:right;margin-top:4px">${timeStr}</div>` : ''}
+    </div>
   `;
   stream.appendChild(row);
   scrollBottom();
 }
 
-function addBotMessage(htmlContent, isThinking = false) {
+function addBotMessage(htmlContent, isThinking = false, timeStr = '') {
   const stream = document.getElementById('chat-stream');
   const row = document.createElement('div');
   row.className = 'gpt-msg-row bot';
@@ -423,6 +964,7 @@ function addBotMessage(htmlContent, isThinking = false) {
     <div class="gpt-bot-avatar">✨</div>
     <div class="gpt-bot-card">
       ${isThinking ? '<span style="color:var(--text-muted);font-style:italic">⏳ Analyzing verified IMD weather models...</span>' : htmlContent}
+      ${(!isThinking && timeStr) ? `<div class="gpt-msg-time" style="font-size:10.5px;color:var(--text-dim);margin-top:8px;text-align:right">${timeStr}</div>` : ''}
     </div>
   `;
   stream.appendChild(row);
@@ -450,18 +992,70 @@ async function submitMessage() {
   input.style.height = 'auto';
   document.getElementById('send-btn').disabled = true;
 
-  addUserMessage(text);
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const city = LocationService?.current?.city || 'India';
+
+  // 1. Add user message to UI & Storage
+  addUserMessage(text, timeStr);
+  ChatStorage.appendMessage({
+    id: 'usr_' + Date.now(),
+    sender: 'user',
+    text: text,
+    timeStr: timeStr,
+    timestamp: Date.now(),
+    city: city
+  });
+
+  // Update recent queries in sidebar
+  renderRecentChatsSidebar(ChatStorage.loadLocal());
+
+  // 2. Add thinking bot card
   const thinkingRow = addBotMessage('', true);
 
   try {
     const rawResponse = await WeatherGPT.getResponse(text, currentLang);
     const card = thinkingRow.querySelector('.gpt-bot-card');
-    card.innerHTML = WeatherGPT.formatMessage(rawResponse);
+    const formattedHtml = WeatherGPT.formatMessage(rawResponse);
+    card.innerHTML = `
+      ${formattedHtml}
+      <div class="gpt-msg-time" style="font-size:10.5px;color:var(--text-dim);margin-top:8px;text-align:right">${timeStr}</div>
+    `;
+
+    // 3. Save bot response to Storage
+    ChatStorage.appendMessage({
+      id: 'bot_' + Date.now(),
+      sender: 'bot',
+      text: rawResponse,
+      html: formattedHtml,
+      rawResponse: rawResponse,
+      timeStr: timeStr,
+      timestamp: Date.now(),
+      city: WeatherGPT._lastQueriedCity || city
+    });
+
+    if (WeatherGPT._lastQueriedCity) {
+      const locText = document.getElementById('location-text');
+      if (locText) locText.textContent = WeatherGPT._lastQueriedCity + ', India';
+    }
   } catch (err) {
     const card = thinkingRow.querySelector('.gpt-bot-card');
-    card.innerHTML = currentLang === 'hi'
+    const errMsg = currentLang === 'hi'
       ? 'मौसम डेटा वर्तमान में अनुपलब्ध है। कृपया कुछ क्षणों बाद पुनः प्रयास करें।'
       : 'Real-time weather data currently updating. Please try again in a moment.';
+    card.innerHTML = `
+      ${errMsg}
+      <div class="gpt-msg-time" style="font-size:10.5px;color:var(--text-dim);margin-top:8px;text-align:right">${timeStr}</div>
+    `;
+    ChatStorage.appendMessage({
+      id: 'bot_' + Date.now(),
+      sender: 'bot',
+      text: errMsg,
+      html: errMsg,
+      timeStr: timeStr,
+      timestamp: Date.now(),
+      city: city
+    });
   }
 
   document.getElementById('send-btn').disabled = false;

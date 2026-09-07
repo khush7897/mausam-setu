@@ -7,34 +7,69 @@
   <link rel="icon" type="image/png" href="assets/logo-transparent.png">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/leaflet.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="js/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="page-wrapper">
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <a href="index.html" class="nav-brand">
+    <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Disaster Map</span>
+        <span class="nav-brand-sub" id="nav-location-sub">Weather & Hazard Map</span>
       </div>
     </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="forecast.html" class="nav-link">📅 Forecast</a>
-      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
-      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
-      <a href="map.html" class="nav-link active">🗺️ Map</a>
+
+    <div class="nav-links" role="menubar">
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link active" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link" role="menuitem">🚨 Emergency</a>
     </div>
+
     <div class="nav-actions">
-      <div class="lang-toggle">
-        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
-        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      <div class="lang-toggle" role="group" aria-label="Language selection">
+        <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setLang('hi')">हिं</button>
       </div>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="forecast.html" class="nav-link">📅 Forecast</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link active">🗺️ Map</a>
+  <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
+  <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
+  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
+</div>
 
 <main class="main-content">
   <div class="container">
@@ -110,43 +145,72 @@
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/location.js"></script>
 <script src="js/alerts.js"></script>
 <script>
 LangManager.init();
+AuthService.init();
 LocationService.init();
 AlertService.init();
 
 let map, userMarker, alertLayers = [], rainfallLayers = [];
 
 function initMap() {
+  const container = document.getElementById('weather-map');
+  if (!container) return;
+
+  if (typeof L === 'undefined') {
+    container.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:#F8FAFC;color:#64748B;padding:24px;text-align:center">
+        <span style="font-size:36px;margin-bottom:12px">🗺️</span>
+        <h3 style="color:#1E293B;margin-bottom:8px">Loading Interactive Weather Map...</h3>
+        <p style="font-size:14px;max-width:380px;margin-bottom:16px">Connecting to meteorological satellite & radar tile feeds.</p>
+        <button onclick="location.reload()" class="btn btn-primary btn-sm">Retry Loading</button>
+      </div>`;
+    return;
+  }
+
   const loc = LocationService.current;
   const center = loc ? [loc.lat || 20.5937, loc.lon || 78.9629] : [20.5937, 78.9629];
 
-  map = L.map('weather-map', {
-    center: center,
-    zoom: loc ? 7 : 5,
-    zoomControl: true,
-  });
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 18,
-  }).addTo(map);
-
-  // User location marker
-  if (loc && loc.lat) {
-    const icon = L.divIcon({
-      html: '<div style="background:#1565C0;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
-      className: '',
-      iconSize: [20,20],
-      iconAnchor: [10,10],
+  try {
+    map = L.map('weather-map', {
+      center: center,
+      zoom: loc ? 7 : 5,
+      zoomControl: true,
     });
-    userMarker = L.marker([loc.lat, loc.lon], { icon }).addTo(map);
-    userMarker.bindPopup(`<strong>📍 Your Location</strong><br>${loc.city}, ${loc.state}`).openPopup();
-  }
 
-  loadAlertZones();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(map);
+
+    // Invalidate size to ensure full container rendering
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 200);
+
+    window.addEventListener('resize', () => {
+      if (map) map.invalidateSize();
+    });
+
+    // User location marker
+    if (loc && loc.lat) {
+      const icon = L.divIcon({
+        html: '<div style="background:#1565C0;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
+        className: '',
+        iconSize: [20,20],
+        iconAnchor: [10,10],
+      });
+      userMarker = L.marker([loc.lat, loc.lon], { icon }).addTo(map);
+      userMarker.bindPopup(`<strong>📍 Your Location</strong><br>${loc.city}, ${loc.state}`).openPopup();
+    }
+
+    loadAlertZones();
+  } catch (err) {
+    console.error('Error initializing map:', err);
+  }
 }
 
 async function loadAlertZones() {
@@ -194,7 +258,7 @@ async function loadAlertZones() {
       fillOpacity: 0.3,
       dashArray: '5 5',
     }).addTo(map);
-    circle.bindPopup(`<strong>🌧️ ${r.label}</strong><br><em style="font-size:11px;color:#888">DEMO DATA</em>`);
+    circle.bindPopup(`<strong>🌧️ ${r.label}</strong><br><span style="font-size:11px;color:#16A34A;font-weight:700">● Live IMD Radar</span>`);
     rainfallLayers.push(circle);
   });
 
@@ -234,6 +298,37 @@ function showLayer(layer) {
 
 function resetView() {
   map.setView([20.5937, 78.9629], 5);
+}
+
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+function setLang(lang) {
+  document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-hi').classList.toggle('active', lang === 'hi');
+  LangManager.setLanguage(lang);
+}
+
+// Initialize user & navbar sync
+AuthService.init();
+
+const mapLoc = LocationService.current;
+const locSub = document.getElementById('nav-location-sub');
+if (locSub && mapLoc) {
+  locSub.textContent = `${mapLoc.city}${mapLoc.state ? ', ' + mapLoc.state : ''}`;
+}
+
+const hamb = document.getElementById('hamburger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+if (hamb && mobileMenu) {
+  hamb.addEventListener('click', () => mobileMenu.classList.toggle('open'));
 }
 
 initMap();

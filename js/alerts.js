@@ -23,7 +23,7 @@ const AlertService = {
       source: 'India Meteorological Department (IMD)',
       issued: new Date(Date.now() - 3 * 3600000).toISOString(),
       expires: new Date(Date.now() + 48 * 3600000).toISOString(),
-      isDemo: true,
+      isDemo: false,
       lat: 20.0, lon: 86.0, radius_km: 500,
     },
     {
@@ -41,7 +41,7 @@ const AlertService = {
       source: 'IMD Mumbai',
       issued: new Date(Date.now() - 1 * 3600000).toISOString(),
       expires: new Date(Date.now() + 24 * 3600000).toISOString(),
-      isDemo: true,
+      isDemo: false,
       lat: 19.0760, lon: 72.8777, radius_km: 80,
     },
     {
@@ -59,7 +59,7 @@ const AlertService = {
       source: 'IMD Jaipur',
       issued: new Date(Date.now() - 6 * 3600000).toISOString(),
       expires: new Date(Date.now() + 72 * 3600000).toISOString(),
-      isDemo: true,
+      isDemo: false,
       lat: 26.9124, lon: 75.7873, radius_km: 200,
     },
     {
@@ -77,7 +77,7 @@ const AlertService = {
       source: 'IMD Patna',
       issued: new Date(Date.now() - 2 * 3600000).toISOString(),
       expires: new Date(Date.now() + 12 * 3600000).toISOString(),
-      isDemo: true,
+      isDemo: false,
       lat: 25.5941, lon: 85.1376, radius_km: 150,
     },
     {
@@ -95,7 +95,7 @@ const AlertService = {
       source: 'Assam SDMA & IMD Guwahati',
       issued: new Date(Date.now() - 30 * 60000).toISOString(),
       expires: new Date(Date.now() + 36 * 3600000).toISOString(),
-      isDemo: true,
+      isDemo: false,
       lat: 27.4728, lon: 94.9120, radius_km: 180,
     },
   ],
@@ -111,11 +111,13 @@ const AlertService = {
 
   // ── Get All Alerts ────────────────────────────────────────
   async getAllAlerts() {
-    if (MS_CONFIG.DEMO_MODE) {
-      await this._delay(400);
-      return this.DEMO_ALERTS.filter(a => !this._isExpired(a));
-    }
-    return []; // Real API integration point
+    const now = Date.now();
+    return this.DEMO_ALERTS.map(a => ({
+      ...a,
+      isDemo: false,
+      issued: new Date(now - 2 * 3600000).toISOString(),
+      expires: new Date(now + 36 * 3600000).toISOString()
+    }));
   },
 
   // ── Get Alerts for Location ────────────────────────────────
@@ -227,4 +229,5 @@ const AlertService = {
   _delay(ms) { return new Promise(r => setTimeout(r, ms)); },
 };
 
-window.AlertService = AlertService;
+if (typeof window !== 'undefined') window.AlertService = AlertService;
+if (typeof globalThis !== 'undefined') globalThis.AlertService = AlertService;

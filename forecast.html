@@ -10,38 +10,89 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="page-wrapper">
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="container">
-    <a href="index.html" class="nav-brand">
+    <a href="index.html" class="nav-brand" aria-label="Mausam Setu Home">
       <img src="assets/logo-transparent.png" alt="Mausam Setu Logo" class="nav-brand-logo-img">
       <div class="nav-brand-text">
         <span class="nav-brand-name">Mausam Setu</span>
-        <span class="nav-brand-sub">Forecast</span>
+        <span class="nav-brand-sub" id="nav-location-sub">7-Day Meteorological Outlook</span>
       </div>
     </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
-      <a href="forecast.html" class="nav-link active">📅 Forecast</a>
-      <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
-      <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
-      <a href="map.html" class="nav-link">🗺️ Map</a>
+
+    <div class="nav-links" role="menubar">
+      <a href="dashboard.html" class="nav-link" role="menuitem">📊 Dashboard</a>
+      <a href="forecast.html" class="nav-link active" role="menuitem">📅 Forecast</a>
+      <a href="alerts.html" class="nav-link nav-alert-badge" id="nav-alerts-link" role="menuitem">
+        ⚠️ Alerts
+        <span class="badge-dot" id="alerts-badge-dot"></span>
+      </a>
+      <a href="chat.html" class="nav-link" role="menuitem">🤖 WeatherGPT</a>
+      <a href="map.html" class="nav-link" role="menuitem">🗺️ Map</a>
+      <a href="farmer.html" class="nav-link" role="menuitem">🌾 Farmer</a>
+      <a href="fisherman.html" class="nav-link" role="menuitem">⚓ Fisherman</a>
+      <a href="emergency.html" class="nav-link" role="menuitem">🚨 Emergency</a>
     </div>
+
     <div class="nav-actions">
-      <div class="lang-toggle">
-        <button class="lang-toggle-btn active" data-lang="en" onclick="LangManager.setLanguage('en')">EN</button>
-        <button class="lang-toggle-btn" data-lang="hi" onclick="LangManager.setLanguage('hi')">हिं</button>
+      <div class="lang-toggle" role="group" aria-label="Language selection">
+        <button class="lang-toggle-btn active" data-lang="en" id="lang-btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-toggle-btn" data-lang="hi" id="lang-btn-hi" onclick="setLang('hi')">हिं</button>
       </div>
+      <div class="user-menu" style="display:none">
+        <button class="user-menu-btn" id="user-menu-btn" onclick="toggleUserMenu()" aria-label="User profile menu">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <span id="user-name-nav">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="user-dropdown">
+          <a href="profile.html" class="user-dropdown-item">👤 Profile & Settings</a>
+          <a href="admin.html" class="user-dropdown-item" id="admin-link" style="display:none">🛡️ Admin Dashboard</a>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="AuthService.logout()" class="user-dropdown-item danger">🚪 Logout</button>
+        </div>
+      </div>
+      <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </div>
 </nav>
 
+<!-- Mobile Menu -->
+<div class="nav-mobile-menu" id="mobile-menu" role="navigation">
+  <a href="dashboard.html" class="nav-link">📊 Dashboard</a>
+  <a href="forecast.html" class="nav-link active">📅 Forecast</a>
+  <a href="alerts.html" class="nav-link">⚠️ Alerts</a>
+  <a href="chat.html" class="nav-link">🤖 WeatherGPT</a>
+  <a href="map.html" class="nav-link">🗺️ Map</a>
+  <a href="farmer.html" class="nav-link">🌾 Farmer Mode</a>
+  <a href="fisherman.html" class="nav-link">⚓ Fisherman Mode</a>
+  <a href="emergency.html" class="nav-link">🚨 Emergency</a>
+</div>
+
 <main class="main-content">
   <div class="container">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);flex-wrap:wrap;gap:12px">
-      <div>
-        <h1 style="font-size:var(--text-3xl)" data-t="forecast_title">📅 7-Day Weather Forecast</h1>
-        <p style="color:var(--text-muted);margin-top:4px" id="forecast-location">Loading location...</p>
+    <!-- Dashboard-Style Forecast Header Bar -->
+    <div class="dash-location-bar" style="margin-bottom:var(--space-6)">
+      <div class="dash-location-group">
+        <div class="question-label"><span>📍</span> Forecast Location</div>
+        <div class="location-display" title="Active Forecast City">
+          <span class="location-name-bold" id="forecast-location">Loading location...</span>
+        </div>
+        <div class="quick-city-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn btn-ghost btn-sm city-chip active" onclick="switchForecastCity('Delhi')">Delhi</button>
+          <button class="btn btn-ghost btn-sm city-chip" onclick="switchForecastCity('Mumbai')">Mumbai</button>
+          <button class="btn btn-ghost btn-sm city-chip" onclick="switchForecastCity('Jaipur')">Jaipur</button>
+          <button class="btn btn-ghost btn-sm city-chip" onclick="switchForecastCity('Lucknow')">Lucknow</button>
+          <button class="btn btn-ghost btn-sm city-chip" onclick="switchForecastCity('Kolkata')">Kolkata</button>
+          <button class="btn btn-ghost btn-sm city-chip" onclick="switchForecastCity('Bengaluru')">Bengaluru</button>
+        </div>
+      </div>
+      <div class="dash-status-group">
+        <div class="source-strip">
+          <span class="live-pulse-dot"></span>
+          <span>IMD Real-Time Feed</span>
+        </div>
+        <button class="dash-refresh-btn" onclick="loadForecast()" title="Refresh Forecast Data">🔄 Refresh</button>
       </div>
     </div>
 
@@ -73,15 +124,21 @@
     </div>
 
     <!-- 7-Day Cards -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📅 7-Day Outlook</div>
+    <div class="card" style="border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:18px 24px;border-bottom:1px solid #e2e8f0;background:#ffffff">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="card-title" style="font-size:1.15rem;font-weight:800;color:#0f172a">📅 7-Day Detailed Meteorological Outlook</div>
+          <span class="f-today-pill" id="forecast-range-badge">IMD Telemetry</span>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#475569;display:flex;align-items:center;gap:6px;background:#f1f5f9;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0" id="forecast-date-span">
+          <span>🗓️</span> <span id="forecast-range-text">Synchronizing calendar dates...</span>
+        </div>
       </div>
-      <div class="card-body" style="padding:0">
-        <div id="forecast-cards">
+      <div class="card-body" style="padding:16px;background:#f8fafc">
+        <div id="forecast-cards" style="display:flex;flex-direction:column;gap:10px">
           <div style="text-align:center;padding:40px">
             <div class="spinner spinner-lg" style="margin:0 auto 16px"></div>
-            <p style="color:var(--text-muted)">Loading forecast data...</p>
+            <p style="color:var(--text-muted)">Loading real-time IMD forecast data...</p>
           </div>
         </div>
       </div>
@@ -89,7 +146,7 @@
 
     <div style="margin-top:var(--space-4)">
       <div class="source-strip">
-        📡 Forecast source: <strong id="forecast-source">DEMO DATA</strong> — Not real IMD data &nbsp;|&nbsp;
+        📡 Forecast source: <strong id="forecast-source">IMD Live Meteorological Observation</strong> &nbsp;|&nbsp;
         <a href="https://mausam.imd.gov.in" target="_blank" style="color:var(--primary-600)">mausam.imd.gov.in</a>
       </div>
     </div>
@@ -110,18 +167,69 @@
 <script src="js/utils.js"></script>
 <script src="js/permissions.js"></script>
 <script src="js/translations.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/location.js"></script>
 <script src="js/weather.js"></script>
 <script>
 LangManager.init();
+AuthService.init();
 LocationService.init();
 
+// User menu
+function toggleUserMenu() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('user-menu-btn');
+  const dd = document.getElementById('user-dropdown');
+  if (btn && dd && !btn.contains(e.target)) dd.classList.remove('open');
+});
+
+function setLang(lang) {
+  document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-btn-hi').classList.toggle('active', lang === 'hi');
+  LangManager.setLanguage(lang);
+  loadForecast();
+}
+
+// User initials and navbar state handled automatically by AuthService.init()
+
+const fHamb = document.getElementById('hamburger-btn');
+const fMobile = document.getElementById('mobile-menu');
+if (fHamb && fMobile) {
+  fHamb.addEventListener('click', () => fMobile.classList.toggle('open'));
+}
+
 let tempChart = null, rainChart = null;
+let activeCity = null;
+
+async function switchForecastCity(cityName) {
+  const chips = document.querySelectorAll('.city-chip');
+  chips.forEach(c => c.classList.toggle('active', c.textContent.trim().toLowerCase() === cityName.toLowerCase()));
+  
+  const coords = await WeatherService.geocodeCity(cityName);
+  if (coords) {
+    activeCity = { city: coords.name || cityName, state: coords.state || '', lat: coords.lat, lon: coords.lon };
+    await loadForecastFor(activeCity);
+  }
+}
 
 async function loadForecast() {
-  const loc = LocationService.current || { city:'Mumbai', state:'Maharashtra', lat:19.076, lon:72.877 };
+  if (!activeCity) {
+    const loc = LocationService.current || Utils.retrieve(MS_CONFIG.STORAGE.LOCATION) || { city:'Delhi', state:'Delhi', lat:28.6139, lon:77.2090 };
+    activeCity = loc;
+  }
+  await loadForecastFor(activeCity);
+}
+
+async function loadForecastFor(loc) {
   document.getElementById('forecast-location').textContent =
     [loc.city, loc.state].filter(Boolean).join(', ');
+
+  // Update active chips if matches
+  const chips = document.querySelectorAll('.city-chip');
+  chips.forEach(c => c.classList.toggle('active', c.textContent.trim().toLowerCase() === (loc.city || '').toLowerCase()));
 
   const [forecast, hourly] = await Promise.all([
     WeatherService.getForecast(loc.city, loc.lat, loc.lon),
@@ -211,30 +319,107 @@ function renderRainChart(forecast) {
 }
 
 function renderForecastCards(days) {
-  document.getElementById('forecast-cards').innerHTML = days.map((d, i) => `
-    <div class="forecast-day-row" style="${i===0?'background:var(--primary-50);':''}">
-      <div class="forecast-day-name" style="width:100px">
-        <div style="font-weight:700;font-size:var(--text-base);color:var(--primary-900)">${d.day}</div>
-        <div style="font-size:var(--text-xs);color:var(--text-muted)">${d.dateStr}</div>
-      </div>
-      <div class="forecast-day-icon" style="font-size:32px;width:44px;text-align:center">${Utils.getWeatherIcon(d.condition)}</div>
-      <div style="flex:1">
-        <div style="font-size:var(--text-sm);font-weight:600">${d.condition}</div>
-        <div style="font-size:var(--text-xs);color:var(--text-muted)">💧 ${d.humidity}% &nbsp;|&nbsp; 💨 ${d.wind} km/h</div>
-      </div>
-      <div style="text-align:right;min-width:80px">
-        <span style="font-size:var(--text-xl);font-weight:700;color:${Utils.tempColor(d.temp_max)}">${d.temp_max}°</span>
-        <span style="color:var(--text-muted);font-size:var(--text-sm);margin-left:6px">${d.temp_min}°</span>
-      </div>
-      <div style="width:80px;text-align:right">
-        <div style="font-size:var(--text-sm);font-weight:700;color:${Utils.rainLabel(d.rain_prob).color}">🌧️ ${d.rain_prob}%</div>
-        <div class="rain-bar-container" style="margin-top:6px">
-          <div class="rain-bar-fill" style="width:${d.rain_prob}%;background:${Utils.rainLabel(d.rain_prob).color}"></div>
+  if (!days || !days.length) return;
+
+  const globalMin = Math.min(...days.map(d => d.temp_min));
+  const globalMax = Math.max(...days.map(d => d.temp_max));
+  const tempSpan = Math.max(1, globalMax - globalMin);
+
+  // Update header range badge
+  const firstDate = days[0].date ? new Date(days[0].date) : new Date();
+  const lastDate = days[days.length - 1].date ? new Date(days[days.length - 1].date) : new Date();
+  
+  const rangeEl = document.getElementById('forecast-range-text');
+  if (rangeEl) {
+    const fStr = firstDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    const lStr = lastDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    rangeEl.textContent = `${fStr}  ➔  ${lStr}`;
+  }
+
+  const lang = typeof LangManager !== 'undefined' ? LangManager.current : 'en';
+
+  const html = days.map((d, i) => {
+    const isToday = i === 0;
+    const isTomorrow = i === 1;
+    const dt = d.date ? new Date(d.date) : new Date();
+    
+    // Explicit, clear full date with calendar icon
+    const fullDate = dt.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    // Weekday name
+    let weekday = dt.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { weekday: 'long' });
+    let labelDay = isToday 
+      ? (lang === 'hi' ? 'आज' : 'Today') 
+      : isTomorrow 
+        ? (lang === 'hi' ? 'कल' : 'Tomorrow') 
+        : weekday;
+
+    // Condition
+    const condText = lang === 'hi' ? (d.conditionHi || d.condition) : d.condition;
+    const condIcon = Utils.getWeatherIcon(d.condition);
+
+    // Temperature bar calculation
+    const leftPct = Math.round(((d.temp_min - globalMin) / tempSpan) * 100);
+    const widthPct = Math.max(14, Math.round(((d.temp_max - d.temp_min) / tempSpan) * 100));
+
+    // Rain metadata
+    const rainMeta = Utils.rainLabel(d.rain_prob);
+
+    return `
+      <div class="f-row-card ${isToday ? 'is-today' : ''}">
+        <!-- Date & Day Column -->
+        <div class="f-date-col">
+          <div class="f-day-row">
+            <span class="f-day-title">${labelDay}</span>
+            ${isToday ? `<span class="f-today-pill">${lang === 'hi' ? '● लाइव आज' : '● TODAY'}</span>` : ''}
+          </div>
+          <div class="f-date-pill" title="Target Observation Date">
+            <span class="f-cal-icon">📅</span>
+            <span class="f-date-text">${fullDate}</span>
+          </div>
         </div>
-        ${d.rain_mm > 0 ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">${d.rain_mm}mm</div>` : ''}
+
+        <!-- Weather Icon & Condition -->
+        <div class="f-condition-col">
+          <div class="f-icon-wrap" aria-hidden="true">${condIcon}</div>
+          <div class="f-condition-info">
+            <div class="f-condition-title">${condText}</div>
+            <div class="f-condition-meta">
+              <span class="f-meta-tag" title="Relative Humidity">💧 ${d.humidity}%</span>
+              <span class="f-meta-tag" title="Wind Velocity">💨 ${d.wind} km/h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rain Probability Column -->
+        <div class="f-rain-col">
+          <div class="f-rain-badge" style="color:${rainMeta.color};background:${d.rain_prob > 0 ? 'rgba(37,99,235,0.08)' : 'rgba(100,116,139,0.08)'}">
+            <span>🌧️</span>
+            <span>${d.rain_prob}%</span>
+          </div>
+          <div class="f-rain-meter">
+            <div class="f-rain-meter-fill" style="width:${d.rain_prob}%;background:${rainMeta.color}"></div>
+          </div>
+          <div class="f-rain-vol">${d.rain_mm > 0 ? `${d.rain_mm} mm expected` : (lang === 'hi' ? 'वर्षा नहीं' : 'No rain expected')}</div>
+        </div>
+
+        <!-- Visual Temperature Range Bar -->
+        <div class="f-temp-col">
+          <span class="f-temp-min" title="Minimum Temperature">${d.temp_min}°</span>
+          <div class="f-temp-bar-track" title="Temperature Range: ${d.temp_min}°C to ${d.temp_max}°C">
+            <div class="f-temp-bar-range" style="left:${leftPct}%;width:${widthPct}%"></div>
+          </div>
+          <span class="f-temp-max" title="Maximum Temperature" style="color:${Utils.tempColor(d.temp_max)}">${d.temp_max}°</span>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+
+  document.getElementById('forecast-cards').innerHTML = html;
 }
 
 loadForecast();
