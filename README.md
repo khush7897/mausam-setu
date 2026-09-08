@@ -27,7 +27,7 @@ The challenge: Indian citizens, especially in rural areas, farmers, and fishing 
 
 ## 🚀 Live Demo
 
-🌐 **[View Live on GitHub Pages](https://YOUR_USERNAME.github.io/mausam-setu)**
+🌐 **[View Live on GitHub Pages](https://khush7897.github.io/mausam-setu)**
 
 ### Demo Accounts
 | Role | Email | Password |
