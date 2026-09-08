@@ -25,6 +25,12 @@ const validatePassword = (password) => {
   return password && password.length >= 6;
 };
 
+const normalizePhone = (p) => {
+  if (!p) return '';
+  const digits = p.replace(/\D/g, '');
+  return digits.length >= 10 ? digits.slice(-10) : digits;
+};
+
 // ── Register Route ────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
@@ -370,12 +376,6 @@ const maskPhone = (phone) => {
   return `+91 ******${phone.slice(-4)}`;
 };
 
-const normalizePhone = (p) => {
-  if (!p) return '';
-  const digits = p.replace(/\D/g, '');
-  return digits.length >= 10 ? digits.slice(-10) : digits;
-};
-
 // ── Forgot Password / Request OTP ─────────────────────────────
 router.post('/forgot-password', async (req, res) => {
   try {
@@ -543,7 +543,8 @@ router.post('/verify-otp', async (req, res) => {
 // ── Reset Password ────────────────────────────────────────────
 router.post('/reset-password', async (req, res) => {
   try {
-    const { identifier, otp, new_password } = req.body;
+    const { identifier, otp } = req.body;
+    const new_password = req.body.new_password || req.body.newPassword;
 
     if (!identifier || !otp || !new_password) {
       return res.status(400).json({

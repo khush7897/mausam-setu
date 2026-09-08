@@ -483,7 +483,8 @@ const ChatStorage = {
   async syncWithServer() {
     try {
       const uid = this.getUserId();
-      const res = await fetch(`/api/ai/history?userId=${encodeURIComponent(uid)}`);
+      const url = (typeof Utils !== 'undefined' && Utils.getApiUrl) ? Utils.getApiUrl(`/api/ai/history?userId=${encodeURIComponent(uid)}`) : `/api/ai/history?userId=${encodeURIComponent(uid)}`;
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success && Array.isArray(data.history) && data.history.length > 0) {
         const local = this.loadLocal();
@@ -514,7 +515,8 @@ const ChatStorage = {
 
     // Asynchronously send to server for permanent SQLite storage
     try {
-      fetch('/api/ai/history', {
+      const url = (typeof Utils !== 'undefined' && Utils.getApiUrl) ? Utils.getApiUrl('/api/ai/history') : '/api/ai/history';
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -537,7 +539,8 @@ const ChatStorage = {
     }
 
     try {
-      await fetch('/api/ai/history', {
+      const url = (typeof Utils !== 'undefined' && Utils.getApiUrl) ? Utils.getApiUrl('/api/ai/history') : '/api/ai/history';
+      await fetch(url, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: this.getUserId() })

@@ -312,6 +312,18 @@ const Utils = {
         hamburger.textContent = '☰';
       });
     });
+  },
+
+  // ── Backend API Endpoint Resolver ─────────────────────────
+  getApiUrl(endpoint) {
+    if (!endpoint) return '';
+    const clean = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+    if (typeof window !== 'undefined') {
+      if (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '5000')) {
+        return `http://localhost:5000${clean}`;
+      }
+    }
+    return clean;
   }
 };
 

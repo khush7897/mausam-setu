@@ -19,13 +19,14 @@ const AuthService = {
 
   // ── Backend API Endpoint Resolver ─────────────────────────
   getApiUrl(endpoint) {
-    if (window.location.protocol === 'file:') {
-      return `http://localhost:5000/api/auth${endpoint}`;
+    const ep = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+    if (typeof Utils !== 'undefined' && Utils.getApiUrl) {
+      return Utils.getApiUrl(`/api/auth${ep}`);
     }
-    if (window.location.port && window.location.port !== '5000') {
-      return `http://localhost:5000/api/auth${endpoint}`;
+    if (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '5000')) {
+      return `http://localhost:5000/api/auth${ep}`;
     }
-    return `/api/auth${endpoint}`;
+    return `/api/auth${ep}`;
   },
 
   SESSION_VERSION: 'v2_clean_reset',

@@ -499,7 +499,8 @@ const WeatherGPT = {
 
   async _fetchAIResponse(msg, lang, location, weather) {
     try {
-      const res = await fetch('/api/ai/chat', {
+      const url = (typeof Utils !== 'undefined' && Utils.getApiUrl) ? Utils.getApiUrl('/api/ai/chat') : '/api/ai/chat';
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

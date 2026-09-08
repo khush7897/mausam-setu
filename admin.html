@@ -439,7 +439,8 @@ async function testConnectedApiKey() {
     btn.textContent = '⏳ Testing Key...';
   }
   try {
-    const res = await fetch('/api/ai/test', { method: 'POST' });
+    const url = (typeof Utils !== 'undefined' && Utils.getApiUrl) ? Utils.getApiUrl('/api/ai/test') : '/api/ai/test';
+    const res = await fetch(url, { method: 'POST' });
     const data = await res.json();
     Utils.showToast(data.message || 'API key verified and operational.', 'success');
   } catch (err) {

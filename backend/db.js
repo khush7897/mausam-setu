@@ -80,22 +80,17 @@ const initSqlite = async () => {
     CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_history(session_id);
   `);
 
-  // Seed demo users only if explicitly requested via SEED_DEMO environment variable
-  if (process.env.SEED_DEMO === 'true') {
-    const countRow = sqliteDb.prepare('SELECT COUNT(*) as count FROM users').get();
-    if (!countRow || countRow.count === 0) {
-      const insertStmt = sqliteDb.prepare(`
+  // Ensure default demo accounts exist so that demo logins work immediately out-of-the-box
+  for (const u of DEMO_SEEDS) {
+    const existing = sqliteDb.prepare('SELECT id FROM users WHERE mobile_number = ?').get(u.mobile);
+    if (!existing) {
+      const salt = await bcryptjs.genSalt(10);
+      const hash = await bcryptjs.hash(u.pass, salt);
+      const uuid = 'demo-' + u.mobile;
+      sqliteDb.prepare(`
         INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      for (const u of DEMO_SEEDS) {
-        const salt = await bcryptjs.genSalt(10);
-        const hash = await bcryptjs.hash(u.pass, salt);
-        const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
-        insertStmt.run(uuid, u.name, u.mobile, u.email, u.role, u.state, hash);
-      }
-      console.log('✓ SQLite database initialized with pre-seeded demo users.');
+      `).run(uuid, u.name, u.mobile, u.email, u.role, u.state, hash);
     }
   }
 
@@ -179,20 +174,17 @@ const initMysql = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // Check count and seed if empty (only when SEED_DEMO is explicitly requested)
-    if (process.env.SEED_DEMO === 'true') {
-      const [rows] = await conn.query('SELECT COUNT(*) as count FROM users');
-      if (rows[0].count === 0) {
-        for (const u of DEMO_SEEDS) {
-          const salt = await bcryptjs.genSalt(10);
-          const hash = await bcryptjs.hash(u.pass, salt);
-          const uuid = 'user-' + Math.random().toString(36).substring(2, 9);
-          await conn.query(
-            'INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [uuid, u.name, u.mobile, u.email, u.role, u.state, hash]
-          );
-        }
-        console.log('✓ MySQL database initialized with pre-seeded demo users.');
+    // Ensure default demo accounts exist so that demo logins work immediately out-of-the-box
+    for (const u of DEMO_SEEDS) {
+      const [existing] = await conn.query('SELECT id FROM users WHERE mobile_number = ?', [u.mobile]);
+      if (existing.length === 0) {
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(u.pass, salt);
+        const uuid = 'demo-' + u.mobile;
+        await conn.query(
+          'INSERT INTO users (uuid, full_name, mobile_number, email, role, state, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [uuid, u.name, u.mobile, u.email, u.role, u.state, hash]
+        );
       }
     }
   } finally {
